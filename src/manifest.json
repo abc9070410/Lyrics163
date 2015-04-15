@@ -1,0 +1,40 @@
+{
+    "name": "Lyrics163",
+    "manifest_version": 2,
+    "version": "0.1.0.0",
+    "description": "The lyrics assistant for music.163.com",
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    },
+    "default_locale": "en",
+    "permissions": [
+        "tabs", "storage"
+    ],
+    "browser_action": {
+        "default_icon": "icon19.png",
+        "default_title": "Lyrics 163",
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "persistent": false,
+        "scripts": [
+            "background.js"
+        ]
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "http://music.163.com/*"
+            ],
+            "css": [
+                "myLyrics.css"
+            ],
+            "js": [
+                "jquery-1.7.2.js",
+                "myLyrics.js"
+            ]
+        }
+    ]
+}
