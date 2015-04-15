@@ -16,6 +16,7 @@
 ## External Utility
 
 - waitForKeyElements (https://gist.github.com/BrockA/2625891)
+- jQuery (https://github.com/jquery/jquery)
 
 ## License
 
