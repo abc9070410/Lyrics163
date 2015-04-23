@@ -8,16 +8,20 @@
 // @grant       none
 // ==/UserScript==
 
-var gsInitFontColor = "green";
-var gsInitBackColor = "black";
-var gsInitFontSize = "30";
-var gsInitFontLeft = "27";
-var gsInitFontBottom = "1";
+var STYLE_RIGHT = 1;
+var STYLE_BOTTOM = 2;
+var STYLE_WIDTH = 3;
+
+var gsFontColor = "green";
+var gsBackColor = "black";
+var gsFontSize = "30";
+var gsFontLeft = "27";
+var gsFontBottom = "1";
+var gsPlayerOffset = "40";
 
 var sTextID = "myTextID";
 var asLyrics = new Array();
 var iLyricsIndex = 0;
-var gasData = new Array(gsInitFontColor, gsInitBackColor, gsInitFontSize, gsInitFontLeft, gsInitFontBottom);
 
 window.onload = init;
 
@@ -31,18 +35,71 @@ function init()
 
 function updateSetting()
 {    
-    chrome.storage.local.get('urlData', function(items) {
-        gasData = items.urlData;
+    chrome.extension.sendMessage({
+        msg: "GetSetting",
+    }, function(response) {
+        gsFontColor = response.fontColor;
+        gsBackColor = response.backColor;
+        gsFontSize = response.fontSize;
+        gsFontLeft = response.fontLeft;
+        gsFontBottom = response.fontBottom;
+        gsPlayerOffset = response.playerOffset;
+        
+        changeLayout();
     });
+}
+
+function changeLayout()
+{
+    var iRightOffset = -gsPlayerOffset;
+    var fRatio = 0.2;
+    
+    changeStyle(document.getElementsByClassName("btns"), STYLE_RIGHT, iRightOffset * 1.1);
+    changeStyle(document.getElementsByClassName("head"), STYLE_RIGHT, iRightOffset);
+    changeStyle(document.getElementsByClassName("play"), STYLE_RIGHT, iRightOffset);
+    changeStyle(document.getElementsByClassName("oper f-fl"), STYLE_RIGHT, iRightOffset * fRatio);
+    changeStyle(document.getElementsByClassName("ctrl f-fl f-pr"), STYLE_RIGHT, iRightOffset * fRatio);
+    changeStyle(document.getElementsByClassName("j-flag time"), STYLE_RIGHT, iRightOffset * fRatio / 2);
+    
+    //changeStyle(document.getElementsByClassName("play"), STYLE_WIDTH, 20);
+    //changeStyle(document.getElementsByClassName("m-pbar"), STYLE_WIDTH, 80);
+    
+    var iBottomOffset = 20;
+    changeStyle(document.getElementsByClassName("oper f-fl"), STYLE_BOTTOM, iBottomOffset);
+    changeStyle(document.getElementsByClassName("ctrl f-fl f-pr"), STYLE_BOTTOM, iBottomOffset);
+    changeStyle(document.getElementsByClassName("j-flag time"), STYLE_BOTTOM, iBottomOffset);
+    
+    //changeStyle(document.getElementsByClassName("list"), STYLE_BOTTOM, -50);
+    //changeStyle(document.getElementById("g_playlist"), STYLE_BOTTOM, -50);
+}
+
+function changeStyle(aeDiv, iStyle, iOffset)
+{
+    for (var i = 0; i < aeDiv.length; i ++)
+    {
+        var eDiv = aeDiv[i];
+        
+        if (iStyle == STYLE_RIGHT)
+        {
+            eDiv.style.position = "relative";
+            eDiv.style.right = iOffset + "%";
+        }
+        else if (iStyle == STYLE_BOTTOM)
+        {
+            eDiv.style.position = "relative";
+            eDiv.style.bottom = iOffset + "%";
+        }
+        else if (iStyle == STYLE_WIDTH)
+        {
+            eDiv.style.position = "relative";
+            eDiv.style.width = iOffset + "%";
+        }
+    }
 }
 
 function getTextHtml(sText)
 {
-    var asData = gasData;    
-    //alert( "DATA:" + asData );
-
-    // data order:　gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom
-    return "<div id='" + sTextID + "' style='font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + asData[2] + "px; color:" + asData[0] + "; background:" + asData[1] + "; position:fixed; bottom:" + asData[4] + "%; left:" + asData[3] + "%; z-index:999999900'>&nbsp;" + sText + "&nbsp;</div>";
+    return "<div id='" + sTextID + "' style='font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + gsFontSize + "px; color:" + gsFontColor + "; background:" + gsBackColor + "; position:fixed; bottom:" + gsFontBottom + "%; left:" + gsFontLeft + "%; z-index:999999900'>&nbsp;" + sText + "&nbsp;</div>";
 }
 
 function setText(sText)

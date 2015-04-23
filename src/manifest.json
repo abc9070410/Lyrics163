@@ -1,7 +1,7 @@
 {
     "name": "Lyrics163",
     "manifest_version": 2,
-    "version": "0.1.0.0",
+    "version": "0.1.0.1",
     "description": "The lyrics assistant for music.163.com",
     "icons": {
         "16": "icon16.png",
