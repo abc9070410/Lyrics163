@@ -8,6 +8,8 @@
 // @grant       none
 // ==/UserScript==
 
+"use strict";
+
 var STYLE_RIGHT = 1;
 var STYLE_BOTTOM = 2;
 var STYLE_WIDTH = 3;
@@ -16,14 +18,16 @@ var gsFontColor = "green";
 var gsBackColor = "black";
 var gsFontSize = "30";
 var gsFontLeft = "27";
-var gsFontBottom = "1";
-var gsPlayerOffset = "40";
+var gsFontBottom = "0";
+var gsPlayerOffset = "60";
 
 var sTextID = "myTextID";
 var asLyrics = new Array();
 var iLyricsIndex = 0;
 
-window.onload = init;
+//window.onload = init;
+
+init();
 
 function init()
 {
@@ -31,12 +35,18 @@ function init()
     //waitForKeyElements("p.j-item", saveLyrics);
     
     updateSetting();
+
+    // 1218 / 2 = 609
+    // min: x / 2 - 800 = -191
+    // max: x / 2 - 100 = 509
+    // screenWidth / 2 - (x * 7 + 100)
 }
 
 function updateSetting()
 {    
     chrome.extension.sendMessage({
         msg: "GetSetting",
+        screenWidth: document.documentElement.clientWidth
     }, function(response) {
         gsFontColor = response.fontColor;
         gsBackColor = response.backColor;
@@ -52,19 +62,19 @@ function updateSetting()
 function changeLayout()
 {
     var iRightOffset = -gsPlayerOffset;
-    var fRatio = 0.2;
+    var iRightOffsetLess = iRightOffset + 400;
+    var iRightOffsetMore = iRightOffset - 40;
     
-    changeStyle(document.getElementsByClassName("btns"), STYLE_RIGHT, iRightOffset * 1.1);
+    changeStyle(document.getElementsByClassName("btns"), STYLE_RIGHT, iRightOffsetMore);
     changeStyle(document.getElementsByClassName("head"), STYLE_RIGHT, iRightOffset);
     changeStyle(document.getElementsByClassName("play"), STYLE_RIGHT, iRightOffset);
-    changeStyle(document.getElementsByClassName("oper f-fl"), STYLE_RIGHT, iRightOffset * fRatio);
-    changeStyle(document.getElementsByClassName("ctrl f-fl f-pr"), STYLE_RIGHT, iRightOffset * fRatio);
-    changeStyle(document.getElementsByClassName("j-flag time"), STYLE_RIGHT, iRightOffset * fRatio / 2);
+    changeStyle(document.getElementsByClassName("oper f-fl"), STYLE_RIGHT, iRightOffsetLess);
+    changeStyle(document.getElementsByClassName("ctrl f-fl f-pr"), STYLE_RIGHT, iRightOffsetLess);
     
     //changeStyle(document.getElementsByClassName("play"), STYLE_WIDTH, 20);
     //changeStyle(document.getElementsByClassName("m-pbar"), STYLE_WIDTH, 80);
     
-    var iBottomOffset = 20;
+    var iBottomOffset = 10;
     changeStyle(document.getElementsByClassName("oper f-fl"), STYLE_BOTTOM, iBottomOffset);
     changeStyle(document.getElementsByClassName("ctrl f-fl f-pr"), STYLE_BOTTOM, iBottomOffset);
     changeStyle(document.getElementsByClassName("j-flag time"), STYLE_BOTTOM, iBottomOffset);
@@ -82,17 +92,17 @@ function changeStyle(aeDiv, iStyle, iOffset)
         if (iStyle == STYLE_RIGHT)
         {
             eDiv.style.position = "relative";
-            eDiv.style.right = iOffset + "%";
+            eDiv.style.right = iOffset + "px";
         }
         else if (iStyle == STYLE_BOTTOM)
         {
             eDiv.style.position = "relative";
-            eDiv.style.bottom = iOffset + "%";
+            eDiv.style.bottom = iOffset + "px";
         }
         else if (iStyle == STYLE_WIDTH)
         {
             eDiv.style.position = "relative";
-            eDiv.style.width = iOffset + "%";
+            eDiv.style.width = iOffset + "px";
         }
     }
 }

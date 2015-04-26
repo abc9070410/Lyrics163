@@ -2,7 +2,7 @@
 
 - A Chrome extension that is a lyrics assistant for music.163.com
 
-![res](screenshot/screen01_lyrics163.png)
+![res](screenshot/screen02_lyrics163.png)
 
 ## Running Environment
 

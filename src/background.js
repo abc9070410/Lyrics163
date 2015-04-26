@@ -1,9 +1,11 @@
+"use strict";
+
 var gsInitFontColor = "green";
 var gsInitBackColor = "black";
-var gsInitFontSize = "30";
+var gsInitFontSize = "34";
 var gsInitFontLeft = "0";
-var gsInitFontBottom = "1";
-var gsInitPlayerOffset = "40";
+var gsInitFontBottom = "0";
+var gsInitPlayerOffset = "300";
 
 var gsFontColor = gsInitFontColor;
 var gsBackColor = gsInitBackColor;
@@ -11,6 +13,9 @@ var gsFontSize = gsInitFontSize;
 var gsFontLeft = gsInitFontLeft;
 var gsFontBottom = gsInitFontBottom;
 var gsPlayerOffset = gsInitPlayerOffset;
+
+var giScreenWidth = 0;
+
 
 initBackground();
 
@@ -62,6 +67,14 @@ function onMyMessage(details, sender, callback)
     }
     else if (details.msg == "GetSetting") {
         //alert( "#RC:setTitleAndPicUrl:" + gasTitle + "___" + gasPicUrl );
+        
+        if (details.screenWidth)
+        {
+            giScreenWidth = details.screenWidth;
+            gsInitPlayerOffset = "" + (giScreenWidth / 2 - 100);
+            //alert( giScreenWidth );
+        }
+        
         if (callback) {
             callback({
                 fontColor: gsFontColor,
@@ -69,7 +82,8 @@ function onMyMessage(details, sender, callback)
                 fontSize: gsFontSize,
                 fontLeft: gsFontLeft,
                 fontBottom: gsFontBottom,
-                playerOffset: gsPlayerOffset
+                playerOffset: gsPlayerOffset,
+                screenWidth: giScreenWidth
             });
             
             return true;
@@ -84,7 +98,8 @@ function onMyMessage(details, sender, callback)
                 fontSize: gsInitFontSize,
                 fontLeft: gsInitFontLeft,
                 fontBottom: gsInitFontBottom,
-                playerOffset: gsInitPlayerOffset
+                playerOffset: gsInitPlayerOffset,
+                screenWidth: giScreenWidth
             });
             
             return true;
