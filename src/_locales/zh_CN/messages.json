@@ -1,0 +1,38 @@
+{
+    "_appName": {
+        "message": "163歌词帮手"
+    },
+    "_appDesc": {
+        "message": "将music.163.com播放中的歌词放大显示"
+    },
+    "_appNote": {
+        "message": "需开启原本的歌词窗口，否则此歌词助手无法显示"
+    },
+    "_fontColor": {
+        "message": "歌词颜色 : "
+    },
+    "_backColor": {
+        "message": "背景颜色 : "
+    },
+    "_backTransparent": {
+        "message": "背景透明化 : "
+    },
+    "_fontSize": {
+        "message": "字体大小 : "
+    },
+    "_fontLeft": {
+        "message": "水平位置 : "
+    },
+    "_fontBottom": {
+        "message": "垂直位置 : "
+    },
+    "_playerOffset": {
+        "message": "播放器位置 : "
+    },
+    "_resetButton": {
+        "message": "回到预设值"
+    },
+    "_confirmButton": {
+        "message": "确认修改"
+    }
+}

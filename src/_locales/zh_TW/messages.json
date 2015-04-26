@@ -1,0 +1,38 @@
+{
+    "_appName": {
+        "message": "163歌詞幫手"
+    },
+    "_appDesc": {
+        "message": "將music.163.com播放中的歌詞放大顯示"
+    },
+    "_appNote": {
+        "message": "需開啟原本的歌詞視窗，否則此歌詞助手無法顯示"
+    },
+    "_fontColor": {
+        "message": "歌詞顏色 : "
+    },
+    "_backColor": {
+        "message": "背景顏色 : "
+    },
+    "_backTransparent": {
+        "message": "背景透明化 : "
+    },
+    "_fontSize": {
+        "message": "字體大小 : "
+    },
+    "_fontLeft": {
+        "message": "水平位置 : "
+    },
+    "_fontBottom": {
+        "message": "垂直位置 : "
+    },
+    "_playerOffset": {
+        "message": "播放器位置 : "
+    },
+    "_resetButton": {
+        "message": "回到預設值"
+    },
+    "_confirmButton": {
+        "message": "確認修改"
+    }
+}

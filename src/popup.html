@@ -5,38 +5,39 @@
     <script src="popup.js"></script>
   </head>
   <body>
+    <div id='divAppNote'></div><hr>
     <form>
         <table style="width:200px">
         <tr>
-            <td>font-color: </td>
+            <td><div id='divFontColor'></div></td>
             <td><input type="color" id="inputFontColor"></input></td></td>
         </tr>
         <tr>
-            <td>back-transparent: </td> 
+            <td><div id='divBackTransparent'></div></td>
             <td><input type="checkbox" id="inputBackTransparent" ></input></td>
         <tr id='trBackColor'>
-            <td>back-color:</td>
+            <td><div id='divBackColor'></div></td>
             <td><input type="color" id="inputBackColor"></input></td>
         </tr>
         <tr>
-            <td>font-size: </td>
+            <td><div id='divFontSize'></div></td>
             <td><input type="number" min="8" max="70" id="inputFontSize"></input></td>
         </tr>
         <tr>
-            <td>font-left: </td>
+            <td><div id='divFontLeft'></div></td>
             <td><input type="number" min="0" max="100" id="inputFontLeft"></input></td>
         </tr>
         <tr>
-            <td>font-bottom: </td>
+            <td><div id='divFontBottom'></div></td>
             <td><input type="number" min="0" max="100" id="inputFontBottom"></input></td>
         </tr>
         <tr>
-            <td>player-offset: </td>
+            <td><div id='divPlayerOffset'></div></td>
             <td><input type="number" min="0" max="100" id="inputPlayerOffset"></input></td>
         </tr>
         <tr>
             <td><input type="button" id="inputResetButton" value="Reset" style="text-align:center"></input></td>
-            <td><input type="button" id="inputSetButton" value="Confirm" style="text-align:center"></input></td>
+            <td><input type="button" id="inputConfirmButton" value="Confirm" style="text-align:center"></input></td>
         </tr>
         </table>
     </form>

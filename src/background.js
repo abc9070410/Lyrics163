@@ -18,13 +18,29 @@ var gbBackTransparent = gbInitBackTransparent;
 
 
 var giScreenWidth = 0;
-
+var gbOnRightPage = true;
 
 initBackground();
 
+function isOnRightPage(url)
+{
+    return url.indexOf("music.163.com") > 0;
+}
+
 function initBackground()
 {
+    chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
+        var tab = chrome.tabs.get(arrayOfTabs[0].id, function(tab) {
+            gbOnRightPage = isOnRightPage(tab.url);
+        });
+    });
+
     chrome.extension.onMessage.addListener(onMyMessage);
+    chrome.tabs.onActivated.addListener(function(info) {
+        var tab = chrome.tabs.get(info.tabId, function(tab) {
+            gbOnRightPage = isOnRightPage(tab.url);
+        });
+    });
 
     chrome.storage.local.get('urlData', function(items) {
         if (items.urlData) // stored the data before
@@ -46,7 +62,6 @@ function initBackground()
         }
     });
 }
-
 
 
 function onMyMessage(details, sender, callback)
@@ -89,7 +104,8 @@ function onMyMessage(details, sender, callback)
                 fontBottom: gsFontBottom,
                 playerOffset: gsPlayerOffset,
                 backTransparent: gbBackTransparent,
-                screenWidth: giScreenWidth
+                screenWidth: giScreenWidth,
+                onRightPage: gbOnRightPage
             });
             
             return true;
@@ -105,6 +121,7 @@ function onMyMessage(details, sender, callback)
                 fontLeft: gsInitFontLeft,
                 fontBottom: gsInitFontBottom,
                 playerOffset: gsInitPlayerOffset,
+                backTransparent: gbInitBackTransparent,
                 screenWidth: giScreenWidth
             });
             

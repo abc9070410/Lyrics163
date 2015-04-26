@@ -1,12 +1,39 @@
 {
-  "application_title": 
-  {
-    "message": "Lyrics163",
-    "description": "The lyrics assistant for music.163.com"
-  },
-  "application_description": 
-  {
-    "message": "Lyrics163",
-    "description": "The lyrics assistant for music.163.com"
-  }
+    "_appName": {
+        "message": "163 Lyrics Helper"
+    },
+    "_appDesc": {
+        "message": "The lyrics assistant for music.163.com"
+    },
+    "_appNote": {
+        "message": "You need to open the original lyrics window or this helper cannot work."
+    },
+    "_fontColor": {
+        "message": "Font-Color : "
+    },
+    "_backColor": {
+        "message": "Back-Color : "
+    },
+    "_backTransparent": {
+        "message": "Back-Transparent : "
+    },
+    "_fontSize": {
+        "message": "Font-Size : "
+    },
+    "_fontLeft": {
+        "message": "Font-Left : "
+    },
+    "_fontBottom": {
+        "message": "Font-Bottom : "
+    },
+    "_playerOffset": {
+        "message": "Player-Offset : "
+    },
+    "_resetButton": {
+        "message": "Reset"
+    },
+    "_confirmButton": {
+        "message": "Confirm"
+    }
+    
 }
