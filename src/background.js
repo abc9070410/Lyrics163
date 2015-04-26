@@ -1,11 +1,12 @@
 "use strict";
 
-var gsInitFontColor = "green";
-var gsInitBackColor = "black";
+var gsInitFontColor = "#008000";
+var gsInitBackColor = "#000000";
 var gsInitFontSize = "34";
 var gsInitFontLeft = "0";
 var gsInitFontBottom = "0";
 var gsInitPlayerOffset = "300";
+var gbInitBackTransparent = false;
 
 var gsFontColor = gsInitFontColor;
 var gsBackColor = gsInitBackColor;
@@ -13,6 +14,8 @@ var gsFontSize = gsInitFontSize;
 var gsFontLeft = gsInitFontLeft;
 var gsFontBottom = gsInitFontBottom;
 var gsPlayerOffset = gsInitPlayerOffset;
+var gbBackTransparent = gbInitBackTransparent;
+
 
 var giScreenWidth = 0;
 
@@ -35,6 +38,7 @@ function initBackground()
             gsFontLeft = asData[3];
             gsFontBottom = asData[4];
             gsPlayerOffset = asData[5];
+            gbBackTransparent = asData[6];
         }
         else // have not store the data yet
         {
@@ -55,8 +59,9 @@ function onMyMessage(details, sender, callback)
         gsFontLeft = details.fontLeft;
         gsFontBottom = details.fontBottom;
         gsPlayerOffset = details.playerOffset;
+        gbBackTransparent = details.backTransparent;
         
-        var asData = new Array(gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsPlayerOffset);
+        var asData = new Array(gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsPlayerOffset, gbBackTransparent);
         chrome.storage.local.set({'urlData':asData});
 
         //alert("FB:" + gsFontBottom);
@@ -83,6 +88,7 @@ function onMyMessage(details, sender, callback)
                 fontLeft: gsFontLeft,
                 fontBottom: gsFontBottom,
                 playerOffset: gsPlayerOffset,
+                backTransparent: gbBackTransparent,
                 screenWidth: giScreenWidth
             });
             

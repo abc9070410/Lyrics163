@@ -20,6 +20,7 @@ var gsFontSize = "30";
 var gsFontLeft = "27";
 var gsFontBottom = "0";
 var gsPlayerOffset = "60";
+var gbBackTransparent = false;
 
 var sTextID = "myTextID";
 var asLyrics = new Array();
@@ -54,6 +55,7 @@ function updateSetting()
         gsFontLeft = response.fontLeft;
         gsFontBottom = response.fontBottom;
         gsPlayerOffset = response.playerOffset;
+        gbBackTransparent = response.backTransparent;
         
         changeLayout();
     });

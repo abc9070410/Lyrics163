@@ -6,16 +6,39 @@
   </head>
   <body>
     <form>
-        font-color: <input type="text" id="inputFontColor"></input><br>
-        back-color: <input type="text" id="inputBackColor"></input><br>
-        font-size(8 ~ 100): <input type="text" id="inputFontSize"></input><br>
-        font-left(0 ~ 100): <input type="text" id="inputFontLeft"></input><br>
-        font-bottom(0 ~ 100): <input type="text" id="inputFontBottom"></input><br>
-        player-offset(0 ~ 100): <input type="text" id="inputPlayerOffset"></input><br>
-        <div id="debugID"></div>
-        <input type="button" id="inputResetButton" value="Reset" style="text-align:center"></input>
-        <input type="button" id="inputSetButton" value="Confirm" style="text-align:center"></input>
-        
+        <table style="width:200px">
+        <tr>
+            <td>font-color: </td>
+            <td><input type="color" id="inputFontColor"></input></td></td>
+        </tr>
+        <tr>
+            <td>back-transparent: </td> 
+            <td><input type="checkbox" id="inputBackTransparent" ></input></td>
+        <tr id='trBackColor'>
+            <td>back-color:</td>
+            <td><input type="color" id="inputBackColor"></input></td>
+        </tr>
+        <tr>
+            <td>font-size: </td>
+            <td><input type="number" min="8" max="70" id="inputFontSize"></input></td>
+        </tr>
+        <tr>
+            <td>font-left: </td>
+            <td><input type="number" min="0" max="100" id="inputFontLeft"></input></td>
+        </tr>
+        <tr>
+            <td>font-bottom: </td>
+            <td><input type="number" min="0" max="100" id="inputFontBottom"></input></td>
+        </tr>
+        <tr>
+            <td>player-offset: </td>
+            <td><input type="number" min="0" max="100" id="inputPlayerOffset"></input></td>
+        </tr>
+        <tr>
+            <td><input type="button" id="inputResetButton" value="Reset" style="text-align:center"></input></td>
+            <td><input type="button" id="inputSetButton" value="Confirm" style="text-align:center"></input></td>
+        </tr>
+        </table>
     </form>
   </body>
 </html>
