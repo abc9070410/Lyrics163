@@ -22,9 +22,17 @@ var gsFontBottom = "0";
 var gsPlayerOffset = "60";
 var gbBackTransparent = false;
 
-var sTextID = "myTextID";
-var asLyrics = new Array();
-var iLyricsIndex = 0;
+var gsFirstID = "myTextID1";
+var gsSecondID = "myTextID2";
+var gasLyrics = new Array();
+var gasTime = new Array();
+var giLyricsIndex = 0;
+
+var gasSongUrl = new Array();
+var gasSongTitle = new Array();
+var gasSongArtist = new Array();
+var gasSongAlbum = new Array();
+var gsPrevious = "";
 
 //window.onload = init;
 
@@ -34,14 +42,256 @@ function init()
 {
     waitForKeyElements("p.j-item.z-sel", showLyrics);
     //waitForKeyElements("p.j-item", saveLyrics);
+    //waitForKeyElements("[tag$=_j-item]", saveLyrics);
+
+    waitForKeyElements("li.js-iparent.z-sel", getNowLyrics);
+    
     
     updateSetting();
 
-    // 1218 / 2 = 609
-    // min: x / 2 - 800 = -191
-    // max: x / 2 - 100 = 509
-    // screenWidth / 2 - (x * 7 + 100)
+    //parseTrackQueue();
+    //addDownloadLink();
+    
+    detectPlay();
 }
+
+
+function detectPlay()
+{
+    var aeDiv = document.getElementsByClassName("ply");
+    //alert(aeDiv.length);
+    for (var i = 0; i < aeDiv.length; i ++)
+    {
+        aeDiv[i].addEventListener('click', clickPlayButton);
+    }
+}
+
+function clickPlayButton()
+{
+    var eDiv = document.getElementById("divDownload");
+    
+    if (eDiv)
+    {
+        eDiv.innerHTML = "";
+    }
+
+    parseTrackQueue();
+    addDownloadLink();
+}
+
+function addDownloadLink()
+{
+    var sHTML = "<div id='divDownload' style='font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + 14 + "px; color:" + gsFontColor + "; position:fixed;     overflow-y:auto; top:" + 20 + "%; left:" + 0 + "%; z-index:999999900; max-width:50%; max-height:70%;'>";
+    
+    sHTML += "<fieldset><legend>MP3</legend>";
+
+    
+    for (var i = 0; i < gasSongUrl.length; i ++)
+    {
+        sHTML += getDownloadHTML(gasSongUrl[i], gasSongArtist[i] + "_" + gasSongTitle[i], gasSongTitle[i]);
+        //sHTML += "<br>";
+    }
+
+    sHTML += "</fieldset></div>";
+    
+    //alert(sHTML);
+    
+    
+    
+    $("body").prepend(sHTML);
+}
+
+function getDownloadHTML(sUrl, sFileName, sTitle)
+{
+    var iMax = 7;
+    if (sTitle.length > iMax)
+    {
+        sTitle = sTitle.substring(0, iMax);
+    }
+
+    return "<a type='button' id='downloadID' href='" + sUrl + "' download='" + sFileName + "'><p style='line-height: 180%;'>" + sTitle + "&nbsp;</p></a>";
+}
+
+function parseTrackQueue()
+{
+    var asToken = localStorage.getItem("track-queue").split(/\"/);
+    var asUrl = new Array();
+    var asTitle = new Array();
+    var asArtist = new Array();
+    var asAlbum = new Array();
+    var index = 0;
+    
+    var STATE_INIT = 0;
+    var STATE_URL_GET = 1;
+    var STATE_TITLE_GET = 2;
+    var STATE_ARTIST_GET = 3;
+    var STATE_ALBUM_GET = 4;
+    var iParseState = STATE_INIT;
+    
+    /*
+    for (var i = 0; i < asToken.length; i ++)
+    {
+        if (asToken[i].match("mp3Url"))
+        {
+            asUrl[index] = asToken[i+2];
+            
+            iParseState = STATE_URL_GET;
+        }
+        else if (asToken[i].match("name"))
+        {
+            if (iParseState == STATE_URL_GET)
+            {
+                asTitle[index] = asToken[i+2];
+                iParseState = STATE_TITLE_GET;
+            }
+            else if (iParseState == STATE_ARTIST_GET)
+            {
+                asArtist[index] = asToken[i+2];
+            }
+            else if (iParseState == STATE_ALBUM_GET)
+            {
+                asAlbum[index] = asToken[i+2];
+                iParseState = STATE_INIT;
+                index++;
+            }
+            
+        }
+        else if (asToken[i].match("artists") && iParseState == STATE_TITLE_GET)
+        {
+            iParseState = STATE_ARTIST_GET;
+        }
+        else if (asToken[i].match("album") && iParseState == STATE_ARTIST_GET)
+        {
+            iParseState = STATE_ALBUM_GET;
+        }
+    }
+    */
+    
+    
+    asToken = JSON.parse(localStorage.getItem("track-queue"));
+    for (var i = 0; i < asToken.length; i ++)
+    {
+        asUrl[i] = asToken[i]["mp3Url"];
+        asTitle[i] = asToken[i]["name"];
+        asArtist[i] = asToken[i]["artists"][0]["name"];
+        asAlbum[i] = asToken[i]["album"]["name"];
+    }
+    
+    //alert(asUrl);
+    
+    //alert(asTitle + asArtist + asAlbum);
+    
+    gasSongUrl = asUrl;
+    gasSongTitle = asTitle;
+    gasSongArtist = asArtist;
+    gasSongAlbum = asAlbum;
+    
+}
+
+function clearLyrics()
+{
+    gasLyrics = new Array(); // clear the previous lyrics
+    gasTime = new Array();
+    giLyricsIndex = 0;
+}
+
+function getNowLyrics(jNode)
+{
+    clearLyrics();
+
+    var sTemp = jNode.html();
+    
+    var iBegin = sTemp.indexOf("songlist-") + 9;
+    var iEnd = sTemp.indexOf("\"", iBegin);
+    var sID = sTemp.substring(iBegin, iEnd);
+    
+    parseLyrics(sID); // send a XHR request to get the lyrics
+}
+
+function parseLyrics(sID)
+{    
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = storeLyrics;
+    xhr.open("GET", "http://music.163.com/api/song/media?id=" + sID + "&version=0&csrf_token=", true);
+    xhr.send();
+}
+
+function storeLyrics()
+{
+    if (this.readyState == 4)
+    {
+        //alert(this.responseText);
+        
+        var asTemp = this.responseText.split(/\[|\]/);
+        
+        for (var i = 2; i < asTemp.length; i += 2)
+        {
+            var sToken = asTemp[i].replace(/\\n/g, "");
+            
+            if (sToken && sToken != "")
+            {
+                gasLyrics[gasLyrics.length] = sToken;
+                gasTime[gasTime.length] = asTemp[i-1];
+            }
+        }
+        
+        //alert(this.responseText);// + "___" + gasLyrics);
+        
+        layoutText("", false); // set the first lyrics (none)
+        layoutText(gasLyrics[0], true); // set the second lyrics
+    }
+}
+
+function getNowLyricsIndex(sTotalSecond)
+{
+    var iMinute = parseInt(sTotalSecond / 60);
+    var iSecond = parseInt(sTotalSecond) % 60;
+    //var f = (parseFloat(sTotalSecond) * 1000) % 1000;
+    
+    iSecond = iSecond < 10 ? "0" + iSecond : iSecond;
+    iMinute = iMinute < 10 ? "0" + iMinute : iMinute;
+    
+    var sTime = iMinute + ":" + iSecond;
+    
+    for (var i = 0; i < gasTime.length; i ++)
+    {
+        if (gasTime[i].indexOf(sTime) == 0)
+        {
+            return i;
+        }
+    }
+    
+    //alert("WRONG TIME: [" + sTime + "]");
+    
+    return -1;
+}
+
+function showLyrics(jNode)
+{
+    updateSetting();
+    
+    var iNowIndex = getNowLyricsIndex(jNode.attr("data-time"));
+    
+    if (iNowIndex < 0)
+    {
+        return; // not match
+    }
+    
+    layoutText(gasLyrics[iNowIndex], false);
+    
+    if (gasLyrics.length > iNowIndex + 1)
+    {
+        layoutText(gasLyrics[iNowIndex+1], true);
+    }
+}
+
+
+
+
+
+
+
+
 
 function updateSetting()
 {    
@@ -109,48 +359,77 @@ function changeStyle(aeDiv, iStyle, iOffset)
     }
 }
 
-function getTextHtml(sText)
+
+function componentToHex(c) 
 {
-    return "<div id='" + sTextID + "' style='font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + gsFontSize + "px; color:" + gsFontColor + "; background:" + gsBackColor + "; position:fixed; bottom:" + gsFontBottom + "%; left:" + gsFontLeft + "%; z-index:999999900'>&nbsp;" + sText + "&nbsp;</div>";
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
 }
 
-function setText(sText)
+function getDarkColor(hex, iOffset)
 {
-    $("body").prepend(getTextHtml(sText));
-}
-
-function saveLyrics(jNode)
-{
-    asLyrics[asLyrics.length] = jNode.html();
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     
-    if (asLyrics.length == 2)
+    if (result)
     {
-        setText(asLyrics[0], 0);
-        setText(asLyrics[1], 1);
+        var r = parseInt(result[1], 16) - iOffset;
+        var g = parseInt(result[2], 16) - iOffset;
+        var b = parseInt(result[3], 16) - iOffset;
+        
+        r = r > 0 ? r : 0;
+        g = g > 0 ? g : 0;
+        b = b > 0 ? b : 0;
+        
+        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
     }
     
-    if (jNode.attr('class').indexOf("z-sel") > 0)
-    {
-        alert(jNode.html());
-    }
+    return null;
 }
 
-function showLyrics(jNode)
+
+function getTextHtml(sText, bSecond)
 {
-    updateSetting();
+    var iLeftOffset = bSecond ? 5 : 0;
+    var iBottomOffset = bSecond ? 5 : 0;
+    var sID = bSecond ? gsSecondID : gsFirstID;
+    var sColor = bSecond ? getDarkColor(gsFontColor, 30) : gsFontColor;
     
-    if (iLyricsIndex == 0)
+    return "<div id='" + sID + "' style='font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + gsFontSize + "px; color:" + sColor + "; background:" + gsBackColor + "; position:fixed; bottom:" + (parseInt(gsFontBottom) + iBottomOffset) + "%; left:" + (parseInt(gsFontLeft) + iLeftOffset) + "%; z-index:999999900'>&nbsp;" + sText + "&nbsp;</div>";
+}
+
+function layoutText(sText, bSecond)
+{
+    if (existText(bSecond))
     {
-        setText(jNode.html());
+        var sID = bSecond ? gsSecondID : gsFirstID;
+        $("#" + sID).html(getTextHtml(sText, bSecond));
     }
     else
     {
-        $("#" + sTextID).html(getTextHtml(jNode.html()));
+        $("body").prepend(getTextHtml(sText, bSecond));
     }
-    iLyricsIndex++;
+}
+
+function existText(bSecond)
+{
+    var sID = bSecond ? gsSecondID : gsFirstID;
+    return $("#" + sID).length;
 }
 
 
+
+
+function copyTextToClipboard(text) 
+{
+    var copyFrom = $('<textarea/>');
+    copyFrom.id = "copyFrom";
+    copyFrom.text(text);
+    $('body').append(copyFrom);
+    copyFrom.select();
+    document.execCommand('copy', true);
+    copyFrom.remove();
+
+}
 
 
 
