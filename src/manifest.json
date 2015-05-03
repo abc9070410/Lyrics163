@@ -1,7 +1,7 @@
 {
     "name": "__MSG__appName__",
     "manifest_version": 2,
-    "version": "0.1.0.5",
+    "version": "0.1.0.6",
     "description": "__MSG__appDesc__",
     "icons": {
         "16": "icon16.png",
@@ -13,7 +13,7 @@
         "tabs", "storage", "http://*/*", "https://*/*"
     ],
     "browser_action": {
-        "default_icon": "icon19.png",
+        "default_icon": "icon19grey.png",
         "default_title": "Lyrics 163",
         "default_popup": "popup.html"
     },

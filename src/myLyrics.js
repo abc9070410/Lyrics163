@@ -33,6 +33,7 @@ var gasSongTitle = new Array();
 var gasSongArtist = new Array();
 var gasSongAlbum = new Array();
 var gsPrevious = "";
+var gsNowSongID = null;
 
 //window.onload = init;
 
@@ -40,11 +41,11 @@ init();
 
 function init()
 {
-    waitForKeyElements("p.j-item.z-sel", showLyrics);
+    //waitForKeyElements("p.j-item.z-sel", showLyrics);
     //waitForKeyElements("p.j-item", saveLyrics);
     //waitForKeyElements("[tag$=_j-item]", saveLyrics);
 
-    waitForKeyElements("li.js-iparent.z-sel", getNowLyrics);
+    //waitForKeyElements("li.js-iparent.z-sel", getNowLyrics);
     
     
     updateSetting();
@@ -53,8 +54,59 @@ function init()
     //addDownloadLink();
     
     detectPlay();
+    
+    window.setInterval(updateLyrics, 1000); 
 }
 
+function updateLyrics()
+{
+
+    var eDiv = document.getElementsByClassName("j-flag time")[0];
+    
+    if (!eDiv)
+    {
+        return;
+    }
+    
+    var sHTML = eDiv.innerHTML;
+    
+    var iBegin = sHTML.indexOf("<em>") + 4;
+    var iEnd = sHTML.indexOf("</em>");
+    
+    if (iBegin < 4 || iEnd < iBegin)
+    {
+        alert("B&E:" + iBegin + "," + iEnd);
+        return;
+    }
+    
+    var asTime = sHTML.substring(iBegin, iEnd).split(":");
+    
+    //alert(asTime);
+
+    var iTotalSecond = parseInt(asTime[0]) * 60 + parseInt(asTime[1]);
+    
+    if (iTotalSecond < 3) // has not played or change to new song
+    {
+        parseNowSong();
+    }
+    
+    //alert(iTotalSecond);
+    var iNowIndex = getNowLyricsIndex(iTotalSecond);
+    
+    if (iNowIndex < 0)
+    {
+        return; // not match
+    }
+    
+    updateSetting();
+    
+    layoutText(gasLyrics[iNowIndex], false);
+    
+    if (gasLyrics.length > iNowIndex + 1)
+    {
+        layoutText(gasLyrics[iNowIndex+1], true);
+    }
+}
 
 function detectPlay()
 {
@@ -77,6 +129,39 @@ function clickPlayButton()
 
     parseTrackQueue();
     addDownloadLink();
+    parseNowSong();
+}
+
+function getNowSongID()
+{
+    var eDiv = document.getElementsByClassName("f-thide name fc1 f-fl")[0];
+    
+    if (!eDiv)
+    {
+        return;
+    }
+    
+    var sID = eDiv.href.split("=")[1];
+    
+    return sID;
+}
+
+function songIsChanged()
+{
+    return gsNowSongID != getNowSongID();
+}
+
+function parseNowSong()
+{
+    var sID = getNowSongID();
+    
+    if (sID != gsNowSongID)
+    {
+        //alert("ID:" + sID + "," + gsNowSongID);
+        clearLyrics();
+        gsNowSongID = sID;
+        parseLyrics(sID); // send a XHR request to get the lyrics
+    }
 }
 
 function addDownloadLink()
@@ -127,46 +212,6 @@ function parseTrackQueue()
     var STATE_ARTIST_GET = 3;
     var STATE_ALBUM_GET = 4;
     var iParseState = STATE_INIT;
-    
-    /*
-    for (var i = 0; i < asToken.length; i ++)
-    {
-        if (asToken[i].match("mp3Url"))
-        {
-            asUrl[index] = asToken[i+2];
-            
-            iParseState = STATE_URL_GET;
-        }
-        else if (asToken[i].match("name"))
-        {
-            if (iParseState == STATE_URL_GET)
-            {
-                asTitle[index] = asToken[i+2];
-                iParseState = STATE_TITLE_GET;
-            }
-            else if (iParseState == STATE_ARTIST_GET)
-            {
-                asArtist[index] = asToken[i+2];
-            }
-            else if (iParseState == STATE_ALBUM_GET)
-            {
-                asAlbum[index] = asToken[i+2];
-                iParseState = STATE_INIT;
-                index++;
-            }
-            
-        }
-        else if (asToken[i].match("artists") && iParseState == STATE_TITLE_GET)
-        {
-            iParseState = STATE_ARTIST_GET;
-        }
-        else if (asToken[i].match("album") && iParseState == STATE_ARTIST_GET)
-        {
-            iParseState = STATE_ALBUM_GET;
-        }
-    }
-    */
-    
     
     asToken = JSON.parse(localStorage.getItem("track-queue"));
     for (var i = 0; i < asToken.length; i ++)
@@ -221,6 +266,12 @@ function storeLyrics()
     if (this.readyState == 4)
     {
         //alert(this.responseText);
+        
+        if (songIsChanged())
+        {
+            alert("song is changed");
+            return;
+        }
         
         var asTemp = this.responseText.split(/\[|\]/);
         
@@ -308,6 +359,15 @@ function updateSetting()
         gbBackTransparent = response.backTransparent;
         
         changeLayout();
+        setIconEnable();
+    });
+}
+
+function setIconEnable()
+{
+    chrome.extension.sendMessage({
+        msg: "SetIcon",
+    }, function(response) {
     });
 }
 
@@ -389,8 +449,8 @@ function getDarkColor(hex, iOffset)
 
 function getTextHtml(sText, bSecond)
 {
-    var iLeftOffset = bSecond ? 5 : 0;
-    var iBottomOffset = bSecond ? 5 : 0;
+    var iLeftOffset = bSecond ? 3 : 0;
+    var iBottomOffset = bSecond ? 8 : 0;
     var sID = bSecond ? gsSecondID : gsFirstID;
     var sColor = bSecond ? getDarkColor(gsFontColor, 30) : gsFontColor;
     

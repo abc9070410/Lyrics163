@@ -111,7 +111,7 @@ function getSetting()
         
         setButtonHTML(response.onRightPage);
         
-        if (response.onRightPage && giScreenWidth <= 0)
+        if (response.onRightPage && giScreenWidth <= 0) // need get the right screen width
         {
             //alert("X");
             reloadPage();

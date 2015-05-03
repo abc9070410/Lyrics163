@@ -19,6 +19,7 @@ var gbBackTransparent = gbInitBackTransparent;
 
 var giScreenWidth = 0;
 var gbOnRightPage = true;
+var gTab = null;
 
 initBackground();
 
@@ -32,14 +33,26 @@ function initBackground()
     chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
         var tab = chrome.tabs.get(arrayOfTabs[0].id, function(tab) {
             gbOnRightPage = isOnRightPage(tab.url);
+            //gTab = arrayOfTabs[0].id;
+            //setIcon();
         });
     });
 
     chrome.extension.onMessage.addListener(onMyMessage);
     chrome.tabs.onActivated.addListener(function(info) {
         var tab = chrome.tabs.get(info.tabId, function(tab) {
+            
             gbOnRightPage = isOnRightPage(tab.url);
+            gTab = info.tabId;
+            setIcon();
+            
+            if (gbOnRightPage)
+            {
+                //giScreenWidth = 0; // init when tab is changed
+            }
         });
+        
+        //alert("ID");
     });
 
     chrome.storage.local.get('urlData', function(items) {
@@ -67,7 +80,7 @@ function initBackground()
 function onMyMessage(details, sender, callback)
 {
     if (details.msg == "SetSetting") {
-        //alert( "#RC:setTitleAndPicUrl:" + gasTitle + "___" + gasPicUrl );
+        
         gsFontColor = details.fontColor;
         gsBackColor = details.backColor;
         gsFontSize = details.fontSize;
@@ -86,7 +99,6 @@ function onMyMessage(details, sender, callback)
         }
     }
     else if (details.msg == "GetSetting") {
-        //alert( "#RC:setTitleAndPicUrl:" + gasTitle + "___" + gasPicUrl );
         
         if (details.screenWidth)
         {
@@ -112,7 +124,7 @@ function onMyMessage(details, sender, callback)
         }
     }
     else if (details.msg == "GetInitSetting") {
-        //alert( "#RC:setTitleAndPicUrl:" + gasTitle + "___" + gasPicUrl );
+        
         if (callback) {
             callback({
                 fontColor: gsInitFontColor,
@@ -128,6 +140,22 @@ function onMyMessage(details, sender, callback)
             return true;
         }
     }
+    else if (details.msg == "SetIcon") {
+        setIcon();
+    }
 }
 
 
+function setIcon()
+{
+    if (!gTab)
+    {
+        //alert("NOT EXIST TAB");
+        return;
+    }
+
+    chrome.browserAction.setIcon({
+        tabId: gTab,
+        path: "icon19.png"
+    });
+}
