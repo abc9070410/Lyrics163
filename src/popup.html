@@ -5,9 +5,13 @@
     <script src="popup.js"></script>
   </head>
   <body>
-    <div id='divAppNote'></div><hr>
+    <div id='divAppNote'></div>
     <form>
         <table style="width:200px">
+        <tr>
+            <td><div id='divDownloadLink'></div></td>
+            <td><input type="checkbox" id="inputDownloadLink" ></input></td>
+        </tr>
         <tr>
             <td><div id='divFontColor'></div></td>
             <td><input type="color" id="inputFontColor"></input></td></td>
@@ -15,6 +19,7 @@
         <tr>
             <td><div id='divBackTransparent'></div></td>
             <td><input type="checkbox" id="inputBackTransparent" ></input></td>
+        </tr>
         <tr id='trBackColor'>
             <td><div id='divBackColor'></div></td>
             <td><input type="color" id="inputBackColor"></input></td>
@@ -32,8 +37,18 @@
             <td><input type="number" min="0" max="100" id="inputFontBottom"></input></td>
         </tr>
         <tr>
+            <td><div id='divFontSecondLeft'></div></td>
+            <td><input type="number" min="0" max="100" id="inputFontSecondLeft"></input></td>
+        </tr>
+        <tr>
+            <td><div id='divFontSecondBottom'></div></td>
+            <td><input type="number" min="0" max="100" id="inputFontSecondBottom"></input></td>
+        </tr>
+        <tr>
             <td><div id='divPlayerOffset'></div></td>
             <td><input type="number" min="0" max="100" id="inputPlayerOffset"></input></td>
+        </tr>
+        <tr>
         </tr>
         <tr>
             <td><input type="button" id="inputResetButton" value="Reset" style="text-align:center"></input></td>

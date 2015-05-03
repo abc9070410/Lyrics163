@@ -8,6 +8,9 @@
     "_appNote": {
         "message": "You need to open the original lyrics window or this helper cannot work."
     },
+    "_downloadLink": {
+        "message": "Download Link : "
+    },
     "_fontColor": {
         "message": "Font-Color : "
     },
@@ -21,10 +24,16 @@
         "message": "Font-Size : "
     },
     "_fontLeft": {
-        "message": "Font-Left : "
+        "message": "Font-Left (First) : "
     },
     "_fontBottom": {
-        "message": "Font-Bottom : "
+        "message": "Font-Bottom (First) : "
+    },
+    "_fontSecondLeft": {
+        "message": "Font-Left (Second) : "
+    },
+    "_fontSecondBottom": {
+        "message": "Font-Bottom (Second) : "
     },
     "_playerOffset": {
         "message": "Player-Offset : "

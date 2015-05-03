@@ -8,6 +8,9 @@
     "_appNote": {
         "message": "需開啟原本的歌詞視窗，否則此歌詞助手無法顯示"
     },
+    "_downloadLink": {
+        "message": "下載連結 : "
+    },
     "_fontColor": {
         "message": "歌詞顏色 : "
     },
@@ -21,10 +24,16 @@
         "message": "字體大小 : "
     },
     "_fontLeft": {
-        "message": "水平位置 : "
+        "message": "第一句水平位置 : "
     },
     "_fontBottom": {
-        "message": "垂直位置 : "
+        "message": "第一句垂直位置 : "
+    },
+    "_fontSecondLeft": {
+        "message": "第二句水平位置 : "
+    },
+    "_fontSecondBottom": {
+        "message": "第二句垂直位置 : "
     },
     "_playerOffset": {
         "message": "播放器位置 : "

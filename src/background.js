@@ -5,17 +5,22 @@ var gsInitBackColor = "#000000";
 var gsInitFontSize = "34";
 var gsInitFontLeft = "0";
 var gsInitFontBottom = "0";
+var gsInitFontSecondLeft = "5";
+var gsInitFontSecondBottom = "7";
 var gsInitPlayerOffset = "300";
 var gbInitBackTransparent = false;
+var gbInitDownloadLink = false;
 
 var gsFontColor = gsInitFontColor;
 var gsBackColor = gsInitBackColor;
 var gsFontSize = gsInitFontSize;
 var gsFontLeft = gsInitFontLeft;
 var gsFontBottom = gsInitFontBottom;
+var gsFontSecondLeft = gsInitFontSecondLeft;
+var gsFontSecondBottom = gsInitFontSecondBottom;
 var gsPlayerOffset = gsInitPlayerOffset;
 var gbBackTransparent = gbInitBackTransparent;
-
+var gbDownloadLink = gbInitDownloadLink;
 
 var giScreenWidth = 0;
 var gbOnRightPage = true;
@@ -28,46 +33,46 @@ function isOnRightPage(url)
     return url.indexOf("music.163.com") > 0;
 }
 
-function initBackground()
+function checkNowPage()
 {
     chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
         var tab = chrome.tabs.get(arrayOfTabs[0].id, function(tab) {
             gbOnRightPage = isOnRightPage(tab.url);
-            //gTab = arrayOfTabs[0].id;
-            //setIcon();
         });
     });
+}
+
+function initBackground()
+{
+    checkNowPage();
 
     chrome.extension.onMessage.addListener(onMyMessage);
     chrome.tabs.onActivated.addListener(function(info) {
-        var tab = chrome.tabs.get(info.tabId, function(tab) {
-            
+        var tab = chrome.tabs.get(info.tabId, function(tab) {     
             gbOnRightPage = isOnRightPage(tab.url);
             gTab = info.tabId;
-            setIcon();
             
-            if (gbOnRightPage)
-            {
-                //giScreenWidth = 0; // init when tab is changed
-            }
+            setIcon();
         });
-        
-        //alert("ID");
     });
 
     chrome.storage.local.get('urlData', function(items) {
-        if (items.urlData) // stored the data before
+        var asData = items.urlData;
+        
+        if (asData && asData.length == 10) // stored the data before
         {
             //sFontColor, sBackColor, sFontSize, sFontLeft, sFontBottom 
-            
-            var asData = items.urlData;
+
             gsFontColor = asData[0];
             gsBackColor = asData[1];
             gsFontSize = asData[2];
             gsFontLeft = asData[3];
             gsFontBottom = asData[4];
-            gsPlayerOffset = asData[5];
-            gbBackTransparent = asData[6];
+            gsFontSecondLeft = asData[5];
+            gsFontSecondBottom = asData[6];
+            gsPlayerOffset = asData[7];
+            gbBackTransparent = asData[8];
+            gbDownloadLink = asData[9];
         }
         else // have not store the data yet
         {
@@ -86,10 +91,13 @@ function onMyMessage(details, sender, callback)
         gsFontSize = details.fontSize;
         gsFontLeft = details.fontLeft;
         gsFontBottom = details.fontBottom;
+        gsFontSecondLeft = details.fontSecondLeft;
+        gsFontSecondBottom = details.fontSecondBottom;
         gsPlayerOffset = details.playerOffset;
         gbBackTransparent = details.backTransparent;
+        gbDownloadLink = details.downloadLink;
         
-        var asData = new Array(gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsPlayerOffset, gbBackTransparent);
+        var asData = new Array(gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsFontSecondLeft, gsFontSecondBottom, gsPlayerOffset, gbBackTransparent, gbDownloadLink);
         chrome.storage.local.set({'urlData':asData});
 
         //alert("FB:" + gsFontBottom);
@@ -99,14 +107,15 @@ function onMyMessage(details, sender, callback)
         }
     }
     else if (details.msg == "GetSetting") {
+        checkNowPage();
         
-        if (details.screenWidth)
+        if (details.screenWidth) // request from the content script (myLyrics.js)
         {
             giScreenWidth = details.screenWidth;
             gsInitPlayerOffset = "" + (giScreenWidth / 2 - 100);
             //alert( giScreenWidth );
         }
-        
+
         if (callback) {
             callback({
                 fontColor: gsFontColor,
@@ -114,8 +123,11 @@ function onMyMessage(details, sender, callback)
                 fontSize: gsFontSize,
                 fontLeft: gsFontLeft,
                 fontBottom: gsFontBottom,
+                fontSecondLeft: gsFontSecondLeft,
+                fontSecondBottom: gsFontSecondBottom,
                 playerOffset: gsPlayerOffset,
                 backTransparent: gbBackTransparent,
+                downloadLink: gbDownloadLink,
                 screenWidth: giScreenWidth,
                 onRightPage: gbOnRightPage
             });
@@ -132,8 +144,11 @@ function onMyMessage(details, sender, callback)
                 fontSize: gsInitFontSize,
                 fontLeft: gsInitFontLeft,
                 fontBottom: gsInitFontBottom,
+                fontSecondLeft: gsInitFontSecondLeft,
+                fontSecondBottom: gsInitFontSecondBottom,
                 playerOffset: gsInitPlayerOffset,
                 backTransparent: gbInitBackTransparent,
+                downloadLink: gbInitDownloadLink,
                 screenWidth: giScreenWidth
             });
             
@@ -141,6 +156,7 @@ function onMyMessage(details, sender, callback)
         }
     }
     else if (details.msg == "SetIcon") {
+        gbOnRightPage = true;
         setIcon();
     }
 }
@@ -153,9 +169,11 @@ function setIcon()
         //alert("NOT EXIST TAB");
         return;
     }
+    
+    var sPath = gbOnRightPage ? "icon19.png" : "icon19grey.png";
 
     chrome.browserAction.setIcon({
         tabId: gTab,
-        path: "icon19.png"
+        path: sPath
     });
 }

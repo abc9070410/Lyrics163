@@ -19,8 +19,11 @@ var gsBackColor = "black";
 var gsFontSize = "30";
 var gsFontLeft = "27";
 var gsFontBottom = "0";
+var gsFontSecondLeft = "30";
+var gsFontSecondBottom = "5";
 var gsPlayerOffset = "60";
 var gbBackTransparent = false;
+var gbDownloadLink = false;
 
 var gsFirstID = "myTextID1";
 var gsSecondID = "myTextID2";
@@ -41,17 +44,7 @@ init();
 
 function init()
 {
-    //waitForKeyElements("p.j-item.z-sel", showLyrics);
-    //waitForKeyElements("p.j-item", saveLyrics);
-    //waitForKeyElements("[tag$=_j-item]", saveLyrics);
-
-    //waitForKeyElements("li.js-iparent.z-sel", getNowLyrics);
-    
-    
     updateSetting();
-
-    //parseTrackQueue();
-    //addDownloadLink();
     
     detectPlay();
     
@@ -84,8 +77,11 @@ function updateLyrics()
     //alert(asTime);
 
     var iTotalSecond = parseInt(asTime[0]) * 60 + parseInt(asTime[1]);
+    var iEarlyOffset = 0; // show each lyrics earlier for 1 second
+
+    iTotalSecond += iEarlyOffset;
     
-    if (iTotalSecond < 3) // has not played or change to new song
+    if (iTotalSecond < (3 + iEarlyOffset)) // has not played or change to new song
     {
         parseNowSong();
     }
@@ -99,6 +95,11 @@ function updateLyrics()
     }
     
     updateSetting();
+    
+    if (!gasLyrics.length || gasLyrics.length < (iNowIndex))
+    {
+        return; // lyrics is not existed
+    }
     
     layoutText(gasLyrics[iNowIndex], false);
     
@@ -114,11 +115,11 @@ function detectPlay()
     //alert(aeDiv.length);
     for (var i = 0; i < aeDiv.length; i ++)
     {
-        aeDiv[i].addEventListener('click', clickPlayButton);
+        //aeDiv[i].addEventListener('click', handleDownloadLink);
     }
 }
 
-function clickPlayButton()
+function handleDownloadLink()
 {
     var eDiv = document.getElementById("divDownload");
     
@@ -126,10 +127,12 @@ function clickPlayButton()
     {
         eDiv.innerHTML = "";
     }
-
-    parseTrackQueue();
-    addDownloadLink();
-    parseNowSong();
+    
+    if (gbDownloadLink)
+    {
+        parseTrackQueue();
+        addDownloadLink();
+    }
 }
 
 function getNowSongID()
@@ -161,6 +164,8 @@ function parseNowSong()
         clearLyrics();
         gsNowSongID = sID;
         parseLyrics(sID); // send a XHR request to get the lyrics
+        
+        handleDownloadLink(); // get the download link if the song is changed
     }
 }
 
@@ -178,10 +183,6 @@ function addDownloadLink()
     }
 
     sHTML += "</fieldset></div>";
-    
-    //alert(sHTML);
-    
-    
     
     $("body").prepend(sHTML);
 }
@@ -240,19 +241,6 @@ function clearLyrics()
     giLyricsIndex = 0;
 }
 
-function getNowLyrics(jNode)
-{
-    clearLyrics();
-
-    var sTemp = jNode.html();
-    
-    var iBegin = sTemp.indexOf("songlist-") + 9;
-    var iEnd = sTemp.indexOf("\"", iBegin);
-    var sID = sTemp.substring(iBegin, iEnd);
-    
-    parseLyrics(sID); // send a XHR request to get the lyrics
-}
-
 function parseLyrics(sID)
 {    
     var xhr = new XMLHttpRequest();
@@ -285,11 +273,17 @@ function storeLyrics()
                 gasTime[gasTime.length] = asTemp[i-1];
             }
         }
+
+        layoutText("", false); // clear the first lyrics
         
-        //alert(this.responseText);// + "___" + gasLyrics);
-        
-        layoutText("", false); // set the first lyrics (none)
-        layoutText(gasLyrics[0], true); // set the second lyrics
+        if (gasLyrics.length)
+        {   
+            layoutText(gasLyrics[0], true); // set the second lyrics
+        }
+        else
+        {
+            layoutText("", true); // clear the second lyrics
+        }
     }
 }
 
@@ -317,35 +311,8 @@ function getNowLyricsIndex(sTotalSecond)
     return -1;
 }
 
-function showLyrics(jNode)
-{
-    updateSetting();
-    
-    var iNowIndex = getNowLyricsIndex(jNode.attr("data-time"));
-    
-    if (iNowIndex < 0)
-    {
-        return; // not match
-    }
-    
-    layoutText(gasLyrics[iNowIndex], false);
-    
-    if (gasLyrics.length > iNowIndex + 1)
-    {
-        layoutText(gasLyrics[iNowIndex+1], true);
-    }
-}
-
-
-
-
-
-
-
-
-
 function updateSetting()
-{    
+{
     chrome.extension.sendMessage({
         msg: "GetSetting",
         screenWidth: document.documentElement.clientWidth
@@ -355,8 +322,11 @@ function updateSetting()
         gsFontSize = response.fontSize;
         gsFontLeft = response.fontLeft;
         gsFontBottom = response.fontBottom;
+        gsFontSecondLeft = response.fontSecondLeft;
+        gsFontSecondBottom = response.fontSecondBottom;
         gsPlayerOffset = response.playerOffset;
         gbBackTransparent = response.backTransparent;
+        gbDownloadLink = response.downloadLink;
         
         changeLayout();
         setIconEnable();
@@ -449,12 +419,12 @@ function getDarkColor(hex, iOffset)
 
 function getTextHtml(sText, bSecond)
 {
-    var iLeftOffset = bSecond ? 3 : 0;
-    var iBottomOffset = bSecond ? 8 : 0;
+    var sFontLeft = bSecond ? gsFontSecondLeft : gsFontLeft;
+    var sFontBottom = bSecond ? gsFontSecondBottom : gsFontBottom;
     var sID = bSecond ? gsSecondID : gsFirstID;
     var sColor = bSecond ? getDarkColor(gsFontColor, 30) : gsFontColor;
     
-    return "<div id='" + sID + "' style='font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + gsFontSize + "px; color:" + sColor + "; background:" + gsBackColor + "; position:fixed; bottom:" + (parseInt(gsFontBottom) + iBottomOffset) + "%; left:" + (parseInt(gsFontLeft) + iLeftOffset) + "%; z-index:999999900'>&nbsp;" + sText + "&nbsp;</div>";
+    return "<div id='" + sID + "' style='font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + gsFontSize + "px; color:" + sColor + "; background:" + gsBackColor + "; position:fixed; bottom:" + sFontBottom + "%; left:" + sFontLeft + "%; z-index:999999900'>&nbsp;" + sText + "&nbsp;</div>";
 }
 
 function layoutText(sText, bSecond)
@@ -490,103 +460,4 @@ function copyTextToClipboard(text)
     copyFrom.remove();
 
 }
-
-
-
-
-
-
-/*--- waitForKeyElements():  A utility function, for Greasemonkey scripts,
-    that detects and handles AJAXed content.
-
-    Usage example:
-
-        waitForKeyElements (
-            "div.comments"
-            , commentCallbackFunction
-        );
-
-        //--- Page-specific function to do what we want when the node is found.
-        function commentCallbackFunction (jNode) {
-            jNode.text ("This comment changed by waitForKeyElements().");
-        }
-
-    IMPORTANT: This function requires your script to have loaded jQuery.
-*/
-function waitForKeyElements (
-    selectorTxt,    /* Required: The jQuery selector string that
-                        specifies the desired element(s).
-                    */
-    actionFunction, /* Required: The code to run when elements are
-                        found. It is passed a jNode to the matched
-                        element.
-                    */
-    bWaitOnce,      /* Optional: If false, will continue to scan for
-                        new elements even after the first match is
-                        found.
-                    */
-    iframeSelector  /* Optional: If set, identifies the iframe to
-                        search.
-                    */
-) {
-    var targetNodes, btargetsFound;
-
-    if (typeof iframeSelector == "undefined")
-        targetNodes     = $(selectorTxt);
-    else
-        targetNodes     = $(iframeSelector).contents ()
-                                           .find (selectorTxt);
-
-    if (targetNodes  &&  targetNodes.length > 0) {
-        btargetsFound   = true;
-        /*--- Found target node(s).  Go through each and act if they
-            are new.
-        */
-        targetNodes.each ( function () {
-            var jThis        = $(this);
-            var alreadyFound = jThis.data ('alreadyFound')  ||  false;
-
-            if (!alreadyFound) {
-                //--- Call the payload function.
-                var cancelFound     = actionFunction (jThis);
-                if (cancelFound)
-                    btargetsFound   = false;
-                else
-                    jThis.data ('alreadyFound', true);
-            }
-        } );
-    }
-    else {
-        btargetsFound   = false;
-    }
-
-    //--- Get the timer-control variable for this selector.
-    var controlObj      = waitForKeyElements.controlObj  ||  {};
-    var controlKey      = selectorTxt.replace (/[^\w]/g, "_");
-    var timeControl     = controlObj [controlKey];
-
-    //--- Now set or clear the timer as appropriate.
-    if (btargetsFound  &&  bWaitOnce  &&  timeControl) {
-        //--- The only condition where we need to clear the timer.
-        clearInterval (timeControl);
-        delete controlObj [controlKey]
-    }
-    else {
-        //--- Set a timer, if needed.
-        if ( ! timeControl) {
-            timeControl = setInterval ( function () {
-                    waitForKeyElements (    selectorTxt,
-                                            actionFunction,
-                                            bWaitOnce,
-                                            iframeSelector
-                                        );
-                },
-                300
-            );
-            controlObj [controlKey] = timeControl;
-        }
-    }
-    waitForKeyElements.controlObj   = controlObj;
-}
-
 

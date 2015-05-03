@@ -1,7 +1,7 @@
 {
     "name": "__MSG__appName__",
     "manifest_version": 2,
-    "version": "0.1.0.6",
+    "version": "0.1.0.7",
     "description": "__MSG__appDesc__",
     "icons": {
         "16": "icon16.png",
@@ -32,7 +32,7 @@
                 "myLyrics.css"
             ],
             "js": [
-                "jquery-1.7.2.js",
+                "jquery-1.7.2.min.js",
                 "myLyrics.js"
             ]
         }
