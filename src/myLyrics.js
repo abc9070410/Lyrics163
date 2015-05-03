@@ -265,7 +265,7 @@ function storeLyrics()
         
         for (var i = 2; i < asTemp.length; i += 2)
         {
-            var sToken = asTemp[i].replace(/\\n/g, "");
+            var sToken = asTemp[i].replace(/\\n/g, "").split("\",\"")[0];
             
             if (sToken && sToken != "")
             {
