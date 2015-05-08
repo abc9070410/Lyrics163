@@ -79,8 +79,21 @@ function initBackground()
         
         }
     });
+    
+    
 }
 
+function sendChangeRequest()
+{
+    chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
+        //alert("ID:" + arrayOfTabs[0].id);
+        chrome.tabs.sendMessage(arrayOfTabs[0].id, {greeting: "ChangeSetting"}, 
+      
+        function(response) {
+            console.log(response.farewell);
+        });
+    });
+}
 
 function onMyMessage(details, sender, callback)
 {
@@ -101,6 +114,8 @@ function onMyMessage(details, sender, callback)
         chrome.storage.local.set({'urlData':asData});
 
         //alert("FB:" + gsFontBottom);
+        
+        sendChangeRequest();
         
         if (callback) {
             return true;

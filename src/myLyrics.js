@@ -37,6 +37,8 @@ var gasSongArtist = new Array();
 var gasSongAlbum = new Array();
 var gsPrevious = "";
 var gsNowSongID = null;
+var giNowLyricsIndex = -1;
+
 
 //window.onload = init;
 
@@ -48,19 +50,30 @@ function init()
     
     detectPlay();
     
+    addChangeListener();
+    
     window.setInterval(updateLyrics, 1000); 
+}
+
+function addChangeListener()
+{
+    chrome.extension.onMessage.addListener(
+        function(request, sender, sendResponse) {
+        if (request.greeting == "ChangeSetting")
+        {
+            updateLyrics();
+        }
+    });
 }
 
 function updateLyrics()
 {
-
     var eDiv = document.getElementsByClassName("j-flag time")[0];
     
     if (!eDiv)
     {
         return;
     }
-    
     var sHTML = eDiv.innerHTML;
     
     var iBegin = sHTML.indexOf("<em>") + 4;
@@ -71,7 +84,6 @@ function updateLyrics()
         alert("B&E:" + iBegin + "," + iEnd);
         return;
     }
-    
     var asTime = sHTML.substring(iBegin, iEnd).split(":");
     
     //alert(asTime);
@@ -85,27 +97,37 @@ function updateLyrics()
     {
         parseNowSong();
     }
-    
-    //alert(iTotalSecond);
+
     var iNowIndex = getNowLyricsIndex(iTotalSecond);
     
-    if (iNowIndex < 0)
+    updateSetting(); // update setting, and reset the lyrics and layout later
+    
+    if (iNowIndex >= 0)
     {
-        return; // not match
+        giNowLyricsIndex = iNowIndex; // change the lyrics index first
     }
-    
-    updateSetting();
-    
-    if (!gasLyrics.length || gasLyrics.length < (iNowIndex))
+}
+
+function layoutLyrics(iNowIndex)
+{
+    layoutText("", false); // clear the first lyrics
+    layoutText("", true); // clear the second lyrics
+
+    if (!gasLyrics.length) // lyrics is not existed
     {
-        return; // lyrics is not existed
     }
-    
-    layoutText(gasLyrics[iNowIndex], false);
-    
-    if (gasLyrics.length > iNowIndex + 1)
+    else if (iNowIndex < 0) // initial
     {
-        layoutText(gasLyrics[iNowIndex+1], true);
+        layoutText(gasLyrics[0], true); // set the second lyrics at the beginning
+    }
+    else if (gasLyrics.length > iNowIndex)
+    {
+        layoutText(gasLyrics[iNowIndex], false);
+    
+        if (gasLyrics.length > iNowIndex + 1 && iNowIndex > 0)
+        {
+            layoutText(gasLyrics[iNowIndex+1], true);
+        }
     }
 }
 
@@ -265,25 +287,16 @@ function storeLyrics()
         
         for (var i = 2; i < asTemp.length; i += 2)
         {
-            var sToken = asTemp[i].replace(/\\n/g, "").split("\",\"")[0];
+            var sToken = asTemp[i].replace(/\\n/g, "").replace("\r", "").split("\",\"")[0];
             
-            if (sToken && sToken != "")
+            if (sToken && sToken != "" && sToken.indexOf("http://") < 0)
             {
                 gasLyrics[gasLyrics.length] = sToken;
                 gasTime[gasTime.length] = asTemp[i-1];
             }
         }
 
-        layoutText("", false); // clear the first lyrics
-        
-        if (gasLyrics.length)
-        {   
-            layoutText(gasLyrics[0], true); // set the second lyrics
-        }
-        else
-        {
-            layoutText("", true); // clear the second lyrics
-        }
+        layoutLyrics(-1);
     }
 }
 
@@ -330,6 +343,8 @@ function updateSetting()
         
         changeLayout();
         setIconEnable();
+        
+        layoutLyrics(giNowLyricsIndex);
     });
 }
 
@@ -424,7 +439,11 @@ function getTextHtml(sText, bSecond)
     var sID = bSecond ? gsSecondID : gsFirstID;
     var sColor = bSecond ? getDarkColor(gsFontColor, 30) : gsFontColor;
     
-    return "<div id='" + sID + "' style='font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + gsFontSize + "px; color:" + sColor + "; background:" + gsBackColor + "; position:fixed; bottom:" + sFontBottom + "%; left:" + sFontLeft + "%; z-index:999999900'>&nbsp;" + sText + "&nbsp;</div>";
+    var sShadowCss1 = "text-shadow: 0.1em 0.1em 0.15em #333;";
+    var sShadowCss2 = "text-shadow: #99FFCC 0px 0px 10px;text-shadow: #99FFCC 0px 0px 10px 10px;";
+    var sShadowCss3 = "text-shadow: 0px 0px 6px rgba(255,255,255,0.7);";
+    
+    return "<div id='" + sID + "' style='" + sShadowCss1 + "font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + gsFontSize + "px; color:" + sColor + "; background:" + gsBackColor + "; font-weight:900; position:fixed; bottom:" + sFontBottom + "%; left:" + sFontLeft + "%; z-index:999999900'>&nbsp;" + sText + "&nbsp;</div>";
 }
 
 function layoutText(sText, bSecond)
