@@ -5,8 +5,8 @@ var gsInitBackColor = "#000000";
 var gsInitFontSize = "34";
 var gsInitFontLeft = "0";
 var gsInitFontBottom = "0";
-var gsInitFontSecondLeft = "5";
-var gsInitFontSecondBottom = "7";
+var gsInitFontSecondLeft = "" + (parseInt(gsInitFontSize) + 5);
+var gsInitFontSecondBottom = "" + (parseInt(gsInitFontSize) + 7);
 var gsInitPlayerOffset = "300";
 var gbInitBackTransparent = false;
 var gbInitDownloadLink = false;
@@ -23,6 +23,7 @@ var gbBackTransparent = gbInitBackTransparent;
 var gbDownloadLink = gbInitDownloadLink;
 
 var giScreenWidth = 0;
+var giScreenHeight = 0;
 var gbOnRightPage = true;
 var gTab = null;
 
@@ -127,8 +128,8 @@ function onMyMessage(details, sender, callback)
         if (details.screenWidth) // request from the content script (myLyrics.js)
         {
             giScreenWidth = details.screenWidth;
-            gsInitPlayerOffset = "" + (giScreenWidth / 2 - 100);
-            //alert( giScreenWidth );
+            giScreenHeight = details.screenHeight;
+            gsInitPlayerOffset = "" + (giScreenWidth - 100);
         }
 
         if (callback) {
@@ -144,6 +145,7 @@ function onMyMessage(details, sender, callback)
                 backTransparent: gbBackTransparent,
                 downloadLink: gbDownloadLink,
                 screenWidth: giScreenWidth,
+                screenHeight: giScreenHeight,
                 onRightPage: gbOnRightPage
             });
             
@@ -164,7 +166,8 @@ function onMyMessage(details, sender, callback)
                 playerOffset: gsInitPlayerOffset,
                 backTransparent: gbInitBackTransparent,
                 downloadLink: gbInitDownloadLink,
-                screenWidth: giScreenWidth
+                screenWidth: giScreenWidth,
+                screenHeight: giScreenHeight
             });
             
             return true;

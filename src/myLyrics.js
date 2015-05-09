@@ -328,7 +328,8 @@ function updateSetting()
 {
     chrome.extension.sendMessage({
         msg: "GetSetting",
-        screenWidth: document.documentElement.clientWidth
+        screenWidth: document.documentElement.clientWidth,
+        screenHeight: document.documentElement.clientHeight
     }, function(response) {
         gsFontColor = response.fontColor;
         gsBackColor = response.backColor;
@@ -358,7 +359,7 @@ function setIconEnable()
 
 function changeLayout()
 {
-    var iRightOffset = -gsPlayerOffset;
+    var iRightOffset = (document.documentElement.clientWidth / 2) - parseInt(gsPlayerOffset);
     var iRightOffsetLess = iRightOffset + 400;
     var iRightOffsetMore = iRightOffset - 40;
     
@@ -443,7 +444,11 @@ function getTextHtml(sText, bSecond)
     var sShadowCss2 = "text-shadow: #99FFCC 0px 0px 10px;text-shadow: #99FFCC 0px 0px 10px 10px;";
     var sShadowCss3 = "text-shadow: 0px 0px 6px rgba(255,255,255,0.7);";
     
-    return "<div id='" + sID + "' style='" + sShadowCss1 + "font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + gsFontSize + "px; color:" + sColor + "; background:" + gsBackColor + "; font-weight:900; position:fixed; bottom:" + sFontBottom + "%; left:" + sFontLeft + "%; z-index:999999900'>&nbsp;" + sText + "&nbsp;</div>";
+    var sFontCss = sText ? ";font-family:Microsoft JhengHei, Microsoft YaHei; border-radius: 10px 10px 10px 10px; font-weight:900; font-size:" + gsFontSize + "px; color:" + sColor + "; background:" + gsBackColor + ";" : "";
+    
+    var sPositionCss = "; position:fixed; bottom:" + sFontBottom + "px; left:" + sFontLeft + "px; z-index:999999900;";
+    
+    return "<div id='" + sID + "' style='" + sFontCss + sShadowCss1 + sPositionCss + "'>&nbsp;" + sText + "&nbsp;</div>";
 }
 
 function layoutText(sText, bSecond)

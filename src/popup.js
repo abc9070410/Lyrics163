@@ -1,13 +1,12 @@
 "use strict";
 
 var giScreenWidth = 0;
+var giScreenHeight = 0;
 
 window.onload = initPopup;
 
 function initPopup()
 {
-    setLanguage();
-    
     getSetting();
 
     //initSetting();
@@ -26,12 +25,12 @@ function setLanguage()
     document.getElementById("divFontColor").innerHTML = chrome.i18n.getMessage("_fontColor");
     document.getElementById("divBackColor").innerHTML = chrome.i18n.getMessage("_backColor");
     document.getElementById("divBackTransparent").innerHTML = chrome.i18n.getMessage("_backTransparent");
-    document.getElementById("divFontSize").innerHTML = chrome.i18n.getMessage("_fontSize");
-    document.getElementById("divFontLeft").innerHTML = chrome.i18n.getMessage("_fontLeft");
-    document.getElementById("divFontBottom").innerHTML = chrome.i18n.getMessage("_fontBottom");
-    document.getElementById("divFontSecondLeft").innerHTML = chrome.i18n.getMessage("_fontSecondLeft");
-    document.getElementById("divFontSecondBottom").innerHTML = chrome.i18n.getMessage("_fontSecondBottom");
-    document.getElementById("divPlayerOffset").innerHTML = chrome.i18n.getMessage("_playerOffset");
+    document.getElementById("divFontSize").innerHTML = chrome.i18n.getMessage("_fontSize") + "(" + document.getElementById("inputFontSize").min + " ~ " + document.getElementById("inputFontSize").max + ")";
+    document.getElementById("divFontLeft").innerHTML = chrome.i18n.getMessage("_fontLeft") + "(" + document.getElementById("inputFontLeft").min + " ~ " + document.getElementById("inputFontLeft").max + ")";
+    document.getElementById("divFontBottom").innerHTML = chrome.i18n.getMessage("_fontBottom") + "(" + document.getElementById("inputFontBottom").min + " ~ " + document.getElementById("inputFontBottom").max + ")";
+    document.getElementById("divFontSecondLeft").innerHTML = chrome.i18n.getMessage("_fontSecondLeft") + "(" + document.getElementById("inputFontSecondLeft").min + " ~ " + document.getElementById("inputFontSecondLeft").max + ")";
+    document.getElementById("divFontSecondBottom").innerHTML = chrome.i18n.getMessage("_fontSecondBottom") + "(" + document.getElementById("inputFontSecondBottom").min + " ~ " + document.getElementById("inputFontSecondBottom").max + ")";
+    document.getElementById("divPlayerOffset").innerHTML = chrome.i18n.getMessage("_playerOffset") + "(" + document.getElementById("inputPlayerOffset").min + " ~ " + document.getElementById("inputPlayerOffset").max + ")";
     document.getElementById("inputResetButton").value = chrome.i18n.getMessage("_resetButton");
     document.getElementById("inputConfirmButton").value = chrome.i18n.getMessage("_confirmButton");
 }
@@ -54,18 +53,6 @@ function changeBackTransparent()
 function clickResetButton()
 {
     initSetting();
-}
-
-// ex. 0 -> 509
-function widthOffsetRatioToPx(iRatio)
-{
-    return parseInt(giScreenWidth) / 2 - (parseInt(iRatio) * 7 + 100);
-}
-
-// ex. 509 -> 0
-function widthOffsetPxToRatio(iPx)
-{
-    return parseInt((giScreenWidth / 2 - parseInt(iPx) - 100) / 7);
 }
 
 function setBackColorHTML()
@@ -95,9 +82,7 @@ function setSetting()
     var sFontBottom = document.getElementById("inputFontBottom").value;
     var sFontSecondLeft = document.getElementById("inputFontSecondLeft").value;
     var sFontSecondBottom = document.getElementById("inputFontSecondBottom").value;
-    var sPlayerOffsetRatio = document.getElementById("inputPlayerOffset").value;
-    
-    var sPlayerOffsetPx = widthOffsetRatioToPx(sPlayerOffsetRatio);
+    var sPlayerOffsetPx = document.getElementById("inputPlayerOffset").value;
 
     chrome.extension.sendMessage({
         msg: "SetSetting",
@@ -123,19 +108,33 @@ function getSetting()
         screenWidth: 0
     }, function(response) {
         giScreenWidth = response.screenWidth;
+        giScreenHeight = response.screenHeight;
         
         setButtonHTML(response.onRightPage);
         
         if (response.onRightPage && giScreenWidth <= 0) 
         {
             // need reload page for getting the right screen width
-            reloadPage();
+            //reloadPage();
         }
+        
+        resetSizeSetting();
+        
+        setLanguage();
         
         setByResponse(response);
         
         setBackColorHTML();
     });
+}
+
+function resetSizeSetting()
+{
+    document.getElementById("inputFontLeft").max = giScreenWidth;
+    document.getElementById("inputFontBottom").max = giScreenHeight;
+    document.getElementById("inputFontSecondLeft").max = giScreenWidth;
+    document.getElementById("inputFontSecondBottom").max = giScreenHeight;
+    document.getElementById("inputPlayerOffset").max = giScreenWidth;
 }
 
 function reloadPage()
@@ -156,6 +155,7 @@ function initSetting()
         msg: "GetInitSetting",
     }, function(response) {
         giScreenWidth = response.screenWidth;
+        giScreenHeight = response.screenHeight;
     
         setByResponse(response);
         
@@ -172,7 +172,7 @@ function setByResponse(response)
     document.getElementById("inputFontBottom").value = response.fontBottom;
     document.getElementById("inputFontSecondLeft").value = response.fontSecondLeft;
     document.getElementById("inputFontSecondBottom").value = response.fontSecondBottom;
-    document.getElementById("inputPlayerOffset").value = widthOffsetPxToRatio(response.playerOffset);
+    document.getElementById("inputPlayerOffset").value = response.playerOffset;
     document.getElementById("inputBackTransparent").checked = response.backTransparent;
     document.getElementById("inputDownloadLink").checked = response.downloadLink;
 }
