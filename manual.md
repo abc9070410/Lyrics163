@@ -33,24 +33,3 @@ http://tinyurl.com/prhervy
 
 ![res](manual/m7.png)
 
-
-
-
-## Running Environment
-
-- Chrome browser
-
-## Development Environment
-
-- Notepad++
-- Chrome browser
-
-## External Utility
-
-- waitForKeyElements (https://gist.github.com/BrockA/2625891)
-- jQuery (https://github.com/jquery/jquery)
-
-## License
-
-- GNU General Public License (http://www.gnu.org/copyleft/gpl.html)
-
