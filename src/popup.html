@@ -5,7 +5,7 @@
     <script src="popup.js"></script>
   </head>
   <body>
-    <div id='divAppNote'></div>
+    <div id='divAppNote' ></div>
     <form>
         <table style="width:300px">
         <tr>
@@ -13,16 +13,25 @@
             <td><input type="checkbox" id="inputDownloadLink" ></input></td>
         </tr>
         <tr>
-            <td><div id='divFontColor'></div></td>
-            <td><input type="color" id="inputFontColor"></input></td></td>
+            <td><div id='divFontShadow'></div></td>
+            <td><input type="checkbox" id="inputFontShadow" ></input></td>
         </tr>
         <tr>
             <td><div id='divBackTransparent'></div></td>
             <td><input type="checkbox" id="inputBackTransparent" ></input></td>
         </tr>
+        <tr>
+            <td><div id='divFontColor'></div></td>
+            <td><input type="color" id="inputFontColor"></input></td></td>
+        </tr>
+        
         <tr id='trBackColor'>
             <td><div id='divBackColor'></div></td>
             <td><input type="color" id="inputBackColor"></input></td>
+        </tr>
+        <tr id='trTransparentRatio'>
+            <td><div id='divTransparentRatio' ></div></td>
+            <td><input type="number" min="0.1" max="0.9" id="inputTransparentRatio" style="width:70px" ></input></td>
         </tr>
         <tr>
             <td><div id='divFontSize'></div></td>

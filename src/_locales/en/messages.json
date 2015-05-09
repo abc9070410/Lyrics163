@@ -43,6 +43,11 @@
     },
     "_confirmButton": {
         "message": "Confirm"
+    },
+    "_fontShadow": {
+        "message": "Font Shadow : "
+    },
+    "_backTransparentRatio": {
+        "message": "Back Transparent Ratio : "
     }
-    
 }

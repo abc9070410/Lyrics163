@@ -24,17 +24,20 @@ var gsFontSecondBottom = "5";
 var gsPlayerOffset = "60";
 var gbBackTransparent = false;
 var gbDownloadLink = false;
+var gbFontShadow = false;
+var gsTransparentRatio = "0.7";
+
 
 var gsFirstID = "myTextID1";
 var gsSecondID = "myTextID2";
-var gasLyrics = new Array();
-var gasTime = new Array();
+var gasLyrics = [];
+var gasTime = [];
 var giLyricsIndex = 0;
 
-var gasSongUrl = new Array();
-var gasSongTitle = new Array();
-var gasSongArtist = new Array();
-var gasSongAlbum = new Array();
+var gasSongUrl = [];
+var gasSongTitle = [];
+var gasSongArtist = [];
+var gasSongAlbum = [];
 var gsPrevious = "";
 var gsNowSongID = null;
 var giNowLyricsIndex = -1;
@@ -113,10 +116,12 @@ function layoutLyrics(iNowIndex)
     layoutText("", false); // clear the first lyrics
     layoutText("", true); // clear the second lyrics
 
-    if (!gasLyrics.length) // lyrics is not existed
+    if (!gasLyrics.length) 
     {
+        return; // lyrics is not existed
     }
-    else if (iNowIndex < 0) // initial
+    
+    if (iNowIndex < 0) // initial
     {
         layoutText(gasLyrics[0], true); // set the second lyrics at the beginning
     }
@@ -135,10 +140,12 @@ function detectPlay()
 {
     var aeDiv = document.getElementsByClassName("ply");
     //alert(aeDiv.length);
+    /*
     for (var i = 0; i < aeDiv.length; i ++)
     {
         //aeDiv[i].addEventListener('click', handleDownloadLink);
     }
+    */
 }
 
 function handleDownloadLink()
@@ -196,7 +203,6 @@ function addDownloadLink()
     var sHTML = "<div id='divDownload' style='font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + 14 + "px; color:" + gsFontColor + "; position:fixed;     overflow-y:auto; top:" + 20 + "%; left:" + 0 + "%; z-index:999999900; max-width:50%; max-height:70%;'>";
     
     sHTML += "<fieldset><legend>MP3</legend>";
-
     
     for (var i = 0; i < gasSongUrl.length; i ++)
     {
@@ -223,10 +229,10 @@ function getDownloadHTML(sUrl, sFileName, sTitle)
 function parseTrackQueue()
 {
     var asToken = localStorage.getItem("track-queue").split(/\"/);
-    var asUrl = new Array();
-    var asTitle = new Array();
-    var asArtist = new Array();
-    var asAlbum = new Array();
+    var asUrl = [];
+    var asTitle = [];
+    var asArtist = [];
+    var asAlbum = [];
     var index = 0;
     
     var STATE_INIT = 0;
@@ -258,8 +264,8 @@ function parseTrackQueue()
 
 function clearLyrics()
 {
-    gasLyrics = new Array(); // clear the previous lyrics
-    gasTime = new Array();
+    gasLyrics = []; // clear the previous lyrics
+    gasTime = [];
     giLyricsIndex = 0;
 }
 
@@ -341,6 +347,8 @@ function updateSetting()
         gsPlayerOffset = response.playerOffset;
         gbBackTransparent = response.backTransparent;
         gbDownloadLink = response.downloadLink;
+        gbFontShadow = response.fontShadow;
+        gsTransparentRatio = response.transparentRatio;
         
         changeLayout();
         setIconEnable();
@@ -412,9 +420,14 @@ function componentToHex(c)
     return hex.length == 1 ? "0" + hex : hex;
 }
 
+function hex2Rgb(hex)
+{
+    return /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+}
+
 function getDarkColor(hex, iOffset)
 {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var result = hex2Rgb(hex);
     
     if (result)
     {
@@ -444,11 +457,18 @@ function getTextHtml(sText, bSecond)
     var sShadowCss2 = "text-shadow: #99FFCC 0px 0px 10px;text-shadow: #99FFCC 0px 0px 10px 10px;";
     var sShadowCss3 = "text-shadow: 0px 0px 6px rgba(255,255,255,0.7);";
     
-    var sFontCss = sText ? ";font-family:Microsoft JhengHei, Microsoft YaHei; border-radius: 10px 10px 10px 10px; font-weight:900; font-size:" + gsFontSize + "px; color:" + sColor + "; background:" + gsBackColor + ";" : "";
+    var sShadowCss = gbFontShadow ? sShadowCss3 : "";
     
-    var sPositionCss = "; position:fixed; bottom:" + sFontBottom + "px; left:" + sFontLeft + "px; z-index:999999900;";
+    var sFontCss = ";font-family:Microsoft JhengHei, Microsoft YaHei; border-radius: 10px 10px 10px 10px; font-weight:900; font-size:" + gsFontSize + "px; color:" + sColor + ";";
     
-    return "<div id='" + sID + "' style='" + sFontCss + sShadowCss1 + sPositionCss + "'>&nbsp;" + sText + "&nbsp;</div>";
+    var sBackgroundCss = gbBackTransparent ? "" : "background:" + gsBackColor + ";";
+    
+    var sPositionCss = sText ? "; position:fixed; bottom:" + sFontBottom + "px; left:" + sFontLeft + "px;z-index:999999900;" : "";
+    
+    var asRGB = hex2Rgb(gsBackColor);
+    var sTransparentCss = gbBackTransparent ? "" : "; background:rgba(" + parseInt(asRGB[1], 16) + "," + parseInt(asRGB[2], 16) + "," + parseInt(asRGB[3], 16) + "," + gsTransparentRatio + ");background: transparent\9;";
+    
+    return "<div id='" + sID + "' style='" + sFontCss + sBackgroundCss + sShadowCss + sPositionCss + sTransparentCss + "'>&nbsp;" + sText + "&nbsp;</div>";
 }
 
 function layoutText(sText, bSecond)

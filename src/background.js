@@ -10,6 +10,9 @@ var gsInitFontSecondBottom = "" + (parseInt(gsInitFontSize) + 7);
 var gsInitPlayerOffset = "300";
 var gbInitBackTransparent = false;
 var gbInitDownloadLink = false;
+var gbInitFontShadow = false;
+var gsInitTransparentRatio = "0.4";
+
 
 var gsFontColor = gsInitFontColor;
 var gsBackColor = gsInitBackColor;
@@ -21,6 +24,8 @@ var gsFontSecondBottom = gsInitFontSecondBottom;
 var gsPlayerOffset = gsInitPlayerOffset;
 var gbBackTransparent = gbInitBackTransparent;
 var gbDownloadLink = gbInitDownloadLink;
+var gbFontShadow = gbInitFontShadow;
+var gsTransparentRatio = gsInitTransparentRatio;
 
 var giScreenWidth = 0;
 var giScreenHeight = 0;
@@ -60,7 +65,7 @@ function initBackground()
     chrome.storage.local.get('urlData', function(items) {
         var asData = items.urlData;
         
-        if (asData && asData.length == 10) // stored the data before
+        if (asData && asData.length == 12) // stored the data before
         {
             //sFontColor, sBackColor, sFontSize, sFontLeft, sFontBottom 
 
@@ -74,10 +79,12 @@ function initBackground()
             gsPlayerOffset = asData[7];
             gbBackTransparent = asData[8];
             gbDownloadLink = asData[9];
+            gbFontShadow = asData[10];
+            gsTransparentRatio = asData[11];
         }
         else // have not store the data yet
         {
-        
+            alert("not match:" + asData.length + " != 12");
         }
     });
     
@@ -110,8 +117,10 @@ function onMyMessage(details, sender, callback)
         gsPlayerOffset = details.playerOffset;
         gbBackTransparent = details.backTransparent;
         gbDownloadLink = details.downloadLink;
+        gbFontShadow = details.fontShadow;
+        gsTransparentRatio = details.transparentRatio;
         
-        var asData = new Array(gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsFontSecondLeft, gsFontSecondBottom, gsPlayerOffset, gbBackTransparent, gbDownloadLink);
+        var asData = [gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsFontSecondLeft, gsFontSecondBottom, gsPlayerOffset, gbBackTransparent, gbDownloadLink, gbFontShadow, gsTransparentRatio];
         chrome.storage.local.set({'urlData':asData});
 
         //alert("FB:" + gsFontBottom);
@@ -144,11 +153,14 @@ function onMyMessage(details, sender, callback)
                 playerOffset: gsPlayerOffset,
                 backTransparent: gbBackTransparent,
                 downloadLink: gbDownloadLink,
+                fontShadow: gbFontShadow,
+                transparentRatio: gsTransparentRatio,
+                
                 screenWidth: giScreenWidth,
                 screenHeight: giScreenHeight,
                 onRightPage: gbOnRightPage
             });
-            
+
             return true;
         }
     }
@@ -166,6 +178,10 @@ function onMyMessage(details, sender, callback)
                 playerOffset: gsInitPlayerOffset,
                 backTransparent: gbInitBackTransparent,
                 downloadLink: gbInitDownloadLink,
+                fontShadow: gbInitFontShadow,
+                transparentRatio: gsInitTransparentRatio,
+                
+                
                 screenWidth: giScreenWidth,
                 screenHeight: giScreenHeight
             });

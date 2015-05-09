@@ -43,5 +43,11 @@
     },
     "_confirmButton": {
         "message": "確認修改"
+    },
+    "_fontShadow": {
+        "message": "陰影特效 : "
+    },
+    "_backTransparentRatio": {
+        "message": "背景透明度 : "
     }
 }
