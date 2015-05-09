@@ -2,9 +2,9 @@
 
 1. 從應用程式商店安裝163歌詞幫手，與VPN跨區工具，方便在163上收聽更多音樂。
 ![res](manual/m2.png)  
-http://tinyurl.com/nqbyo7z
+http://tinyurl.com/nqbyo7z  
 ![res](manual/m1.png)  
-http://tinyurl.com/prhervy
+http://tinyurl.com/prhervy  
 
 
 2. 前往163音樂網  
