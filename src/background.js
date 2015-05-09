@@ -44,6 +44,8 @@ function checkNowPage()
     chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
         var tab = chrome.tabs.get(arrayOfTabs[0].id, function(tab) {
             gbOnRightPage = isOnRightPage(tab.url);
+            
+            setIcon();
         });
     });
 }
@@ -53,14 +55,6 @@ function initBackground()
     checkNowPage();
 
     chrome.extension.onMessage.addListener(onMyMessage);
-    chrome.tabs.onActivated.addListener(function(info) {
-        var tab = chrome.tabs.get(info.tabId, function(tab) {     
-            gbOnRightPage = isOnRightPage(tab.url);
-            gTab = info.tabId;
-            
-            setIcon();
-        });
-    });
 
     chrome.storage.local.get('urlData', function(items) {
         var asData = items.urlData;
@@ -197,17 +191,15 @@ function onMyMessage(details, sender, callback)
 
 
 function setIcon()
-{
-    if (!gTab)
-    {
-        //alert("NOT EXIST TAB");
-        return;
-    }
-    
+{   
     var sPath = gbOnRightPage ? "icon19.png" : "icon19grey.png";
-
-    chrome.browserAction.setIcon({
-        tabId: gTab,
-        path: sPath
+    
+    chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
+        chrome.browserAction.setIcon({
+            tabId: arrayOfTabs[0].id,
+            path: sPath
+        });
     });
+
+    
 }

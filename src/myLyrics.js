@@ -56,6 +56,8 @@ function init()
     addChangeListener();
     
     window.setInterval(updateLyrics, 1000); 
+    
+    setIconEnable();
 }
 
 function addChangeListener()
@@ -351,8 +353,7 @@ function updateSetting()
         gsTransparentRatio = response.transparentRatio;
         
         changeLayout();
-        setIconEnable();
-        
+
         layoutLyrics(giNowLyricsIndex);
     });
 }
