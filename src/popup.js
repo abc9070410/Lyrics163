@@ -121,8 +121,9 @@ function getSetting()
         
         if (response.onRightPage && giScreenWidth <= 0) 
         {
+            //alert("NEED RELOAD PAGE");
             // need reload page for getting the right screen width
-            //reloadPage();
+            reloadPage();
         }
         
         resetSizeSetting();

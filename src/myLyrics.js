@@ -41,7 +41,7 @@ var gasSongAlbum = [];
 var gsPrevious = "";
 var gsNowSongID = null;
 var giNowLyricsIndex = -1;
-
+var giTempNowIndex = 0;
 
 //window.onload = init;
 
@@ -103,13 +103,13 @@ function updateLyrics()
         parseNowSong();
     }
 
-    var iNowIndex = getNowLyricsIndex(iTotalSecond);
+    giTempNowIndex = getNowLyricsIndex(iTotalSecond);
     
     updateSetting(); // update setting, and reset the lyrics and layout later
     
-    if (iNowIndex >= 0)
+    if (giTempNowIndex >= 0)
     {
-        giNowLyricsIndex = iNowIndex; // change the lyrics index first
+        giNowLyricsIndex = giTempNowIndex; // change the lyrics index first
     }
 }
 
@@ -295,7 +295,7 @@ function storeLyrics()
         
         for (var i = 2; i < asTemp.length; i += 2)
         {
-            var sToken = asTemp[i].replace(/\\n/g, "").replace("\r", "").split("\",\"")[0];
+            var sToken = asTemp[i].replace(/\\n/g, "").replace("\\r", "").split("\",\"")[0];
             
             if (sToken && sToken != "" && sToken.indexOf("http://") < 0)
             {
@@ -308,10 +308,24 @@ function storeLyrics()
     }
 }
 
+// ex. 04:20.3 -> 4 * 60 + 20 = 260
+function timeToSecond(sTime)
+{
+    var asToken = sTime.split(/:|\./);
+    
+    if (asToken.length < 2)
+    {
+        return 0;
+    }
+    
+    return parseInt(asToken[0]) * 60 + parseInt(asToken[1]);
+}
+
 function getNowLyricsIndex(sTotalSecond)
 {
-    var iMinute = parseInt(sTotalSecond / 60);
-    var iSecond = parseInt(sTotalSecond) % 60;
+    var iTotoalSecond = parseInt(sTotalSecond);
+    var iMinute = parseInt(iTotoalSecond / 60);
+    var iSecond = iTotoalSecond % 60;
     //var f = (parseFloat(sTotalSecond) * 1000) % 1000;
     
     iSecond = iSecond < 10 ? "0" + iSecond : iSecond;
@@ -325,6 +339,16 @@ function getNowLyricsIndex(sTotalSecond)
         {
             return i;
         }
+        /*
+        else if (i > 1 && giTempNowIndex == -1 && 
+                 iTotoalSecond == timeToSecond(gasTime[i]) - 1 && 
+                 iTotoalSecond > timeToSecond(gasTime[i-1]))
+        {
+            //alert(iTotoalSecond + "," + timeToSecond(gasTime[i-1]) + "," + timeToSecond(gasTime[i]));
+            // update the lyrics cause sometimes the time label jumps 2 seconds once
+            return i; 
+        }
+        */
     }
     
     //alert("WRONG TIME: [" + sTime + "]");
