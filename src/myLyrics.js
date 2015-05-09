@@ -287,7 +287,7 @@ function storeLyrics()
         
         if (songIsChanged())
         {
-            alert("song is changed");
+            //alert("song is changed");
             return;
         }
         
