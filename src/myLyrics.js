@@ -26,7 +26,7 @@ var gbBackTransparent = false;
 var gbDownloadLink = false;
 var gbFontShadow = false;
 var gsTransparentRatio = "0.7";
-
+var gbEnable = true;
 
 var gsFirstID = "myTextID1";
 var gsSecondID = "myTextID2";
@@ -73,6 +73,11 @@ function addChangeListener()
 
 function updateLyrics()
 {
+    if (!gbEnable)
+    {
+        return;
+    }
+
     var eDiv = document.getElementsByClassName("j-flag time")[0];
     
     if (!eDiv)
@@ -113,10 +118,15 @@ function updateLyrics()
     }
 }
 
-function layoutLyrics(iNowIndex)
+function clearLayoutLyrics()
 {
     layoutText("", false); // clear the first lyrics
     layoutText("", true); // clear the second lyrics
+}
+
+function layoutLyrics(iNowIndex)
+{
+    clearLayoutLyrics();
 
     if (!gasLyrics.length) 
     {
@@ -375,17 +385,24 @@ function updateSetting()
         gbDownloadLink = response.downloadLink;
         gbFontShadow = response.fontShadow;
         gsTransparentRatio = response.transparentRatio;
+        gbEnable = response.enable;
 
-        changeLayout();
-
-        layoutLyrics(giNowLyricsIndex);
+        if (gbEnable)
+        {
+            changeLayout();
+            layoutLyrics(giNowLyricsIndex);
+        }
+        else
+        {
+            clearLayoutLyrics();
+        }
     });
 }
 
 function setIconEnable()
 {
     chrome.extension.sendMessage({
-        msg: "SetIcon",
+        msg: "SetIcon"
     }, function(response) {
     });
 }
@@ -491,7 +508,7 @@ function getTextHtml(sText, bSecond)
     var sPositionCss = sText ? "; position:fixed; bottom:" + sFontBottom + "px; left:" + sFontLeft + "px;z-index:999999900;" : "";
     
     var asRGB = hex2Rgb(gsBackColor);
-    var sTransparentCss = gbBackTransparent ? "" : "; background:rgba(" + parseInt(asRGB[1], 16) + "," + parseInt(asRGB[2], 16) + "," + parseInt(asRGB[3], 16) + "," + gsTransparentRatio + ");background: transparent\9;";
+    var sTransparentCss = gbBackTransparent || !asRGB ? "" : "; background:rgba(" + parseInt(asRGB[1], 16) + "," + parseInt(asRGB[2], 16) + "," + parseInt(asRGB[3], 16) + "," + gsTransparentRatio + ");background: transparent\9;";
     
     return "<div id='" + sID + "' style='" + sFontCss + sBackgroundCss + sShadowCss + sPositionCss + sTransparentCss + "'>&nbsp;" + sText + "&nbsp;</div>";
 }

@@ -12,7 +12,7 @@ var gbInitBackTransparent = false;
 var gbInitDownloadLink = false;
 var gbInitFontShadow = false;
 var gsInitTransparentRatio = "0.4";
-
+var gbInitEnable = true;
 
 var gsFontColor = gsInitFontColor;
 var gsBackColor = gsInitBackColor;
@@ -26,6 +26,7 @@ var gbBackTransparent = gbInitBackTransparent;
 var gbDownloadLink = gbInitDownloadLink;
 var gbFontShadow = gbInitFontShadow;
 var gsTransparentRatio = gsInitTransparentRatio;
+var gbEnable = gbInitEnable;
 
 var giScreenWidth = 0;
 var giScreenHeight = 0;
@@ -59,7 +60,7 @@ function initBackground()
     chrome.storage.local.get('urlData', function(items) {
         var asData = items.urlData;
         
-        if (asData && asData.length == 12) // stored the data before
+        if (asData && asData.length == 13) // stored the data before
         {
             //sFontColor, sBackColor, sFontSize, sFontLeft, sFontBottom 
 
@@ -75,6 +76,7 @@ function initBackground()
             gbDownloadLink = asData[9];
             gbFontShadow = asData[10];
             gsTransparentRatio = asData[11];
+            gbEnable = asData[12];
         }
         else // have not store the data yet
         {
@@ -113,10 +115,11 @@ function onMyMessage(details, sender, callback)
         gbDownloadLink = details.downloadLink;
         gbFontShadow = details.fontShadow;
         gsTransparentRatio = details.transparentRatio;
+        gbEnable = details.enable;
         
-        var asData = [gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsFontSecondLeft, gsFontSecondBottom, gsPlayerOffset, gbBackTransparent, gbDownloadLink, gbFontShadow, gsTransparentRatio];
+        var asData = [gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsFontSecondLeft, gsFontSecondBottom, gsPlayerOffset, gbBackTransparent, gbDownloadLink, gbFontShadow, gsTransparentRatio, gbEnable];
         chrome.storage.local.set({'urlData':asData});
-
+        
         //alert("FB:" + gsFontBottom);
         
         sendChangeRequest();
@@ -150,6 +153,8 @@ function onMyMessage(details, sender, callback)
                 downloadLink: gbDownloadLink,
                 fontShadow: gbFontShadow,
                 transparentRatio: gsTransparentRatio,
+                enable: gbEnable,
+                
                 
                 screenWidth: giScreenWidth,
                 screenHeight: giScreenHeight,
@@ -174,6 +179,7 @@ function onMyMessage(details, sender, callback)
                 downloadLink: gbInitDownloadLink,
                 fontShadow: gbInitFontShadow,
                 transparentRatio: gsInitTransparentRatio,
+                enable: gbEnable,
                 
                 
                 screenWidth: giScreenWidth,

@@ -1,0 +1,53 @@
+
+
+.dark_button{
+    border-top: 1px solid #969696;
+   background: #000000;
+   background: -webkit-gradient(linear, left top, left bottom, from(#545454), to(#000000));
+   background: -webkit-linear-gradient(top, #545454, #000000);
+   background: -moz-linear-gradient(top, #545454, #000000);
+   background: -ms-linear-gradient(top, #545454, #000000);
+   background: -o-linear-gradient(top, #545454, #000000);
+   padding: 5px 10px;
+   -webkit-border-radius: 8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-align:center;
+   //position:relative;
+   //left:20px;
+}
+
+.dark_button:hover {
+   border-top-color: #4f4f4f;
+   background: #4f4f4f;
+   color: #ccc;
+   text-decoration:none;
+}
+
+.dark_button:active {
+   border-top-color: #4a4a4a;
+   background: #4a4a4a;
+}
+
+.dark_button_text {
+    text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: #e3e3e3 !important;
+   font-size: 14px;
+   text-decoration: none;
+   vertical-align: middle;
+}
+
+.width{
+    width: 95%;
+}
+
+body {
+    min-width:300px;
+}
+
+.label {
+    text-align:center;
+}

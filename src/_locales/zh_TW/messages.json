@@ -3,7 +3,7 @@
         "message": "163歌詞幫手"
     },
     "_appDesc": {
-        "message": "將music.163.com播放中的歌詞放大顯示"
+        "message": "將網易雲音樂(music.163.com)播放中的歌詞放大顯示"
     },
     "_appNote": {
         "message": "需開啟原本的歌詞視窗，否則此歌詞助手無法顯示"
@@ -49,5 +49,11 @@
     },
     "_backTransparentRatio": {
         "message": "背景透明度 : "
+    },
+    "_enableButton": {
+        "message": "啟用"
+    },
+    "_disableButton": {
+        "message": "關閉"
     }
 }

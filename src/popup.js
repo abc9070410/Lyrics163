@@ -2,6 +2,7 @@
 
 var giScreenWidth = 0;
 var giScreenHeight = 0;
+var gbEnable = true;
 
 window.onload = initPopup;
 
@@ -11,6 +12,7 @@ function initPopup()
 
     //initSetting();
     
+    document.getElementById("divEnableButton").addEventListener('click', clickEnableButton);
     document.getElementById("inputConfirmButton").addEventListener('click', clickSetButton);
     document.getElementById("inputResetButton").addEventListener('click', clickResetButton);
     document.getElementById("inputBackTransparent").addEventListener('change', changeBackTransparent);
@@ -19,7 +21,7 @@ function initPopup()
 
 function setLanguage()
 {
-    //document.getElementById("divAppNote").innerHTML = chrome.i18n.getMessage("_appNote");
+    document.getElementById("divAppNote").innerHTML = chrome.i18n.getMessage("_appName");
 
     document.getElementById("divDownloadLink").innerHTML = chrome.i18n.getMessage("_downloadLink");
     document.getElementById("divFontColor").innerHTML = chrome.i18n.getMessage("_fontColor");
@@ -35,6 +37,30 @@ function setLanguage()
     document.getElementById("divTransparentRatio").innerHTML = chrome.i18n.getMessage("_backTransparentRatio") + "(" + document.getElementById("inputTransparentRatio").min + " ~ " + document.getElementById("inputTransparentRatio").max + ")";
     document.getElementById("inputResetButton").value = chrome.i18n.getMessage("_resetButton");
     document.getElementById("inputConfirmButton").value = chrome.i18n.getMessage("_confirmButton");
+    
+    updateEnableButton();
+}
+
+function updateEnableButton()
+{
+    var sEnableText = chrome.i18n.getMessage("_enableButton");
+    var sDisableText = chrome.i18n.getMessage("_disableButton");
+
+    document.getElementById("aEnableButton").innerHTML = gbEnable ? sDisableText : sEnableText;
+    
+    var sDisplay = gbEnable ? "" : "none";
+
+    document.getElementById("formMainTable").style.display = sDisplay;
+}
+
+function clickEnableButton()
+{
+    gbEnable = !gbEnable;
+    
+    setSetting();
+    updateEnableButton();
+    
+    reloadPage(); // enable the new setting
 }
 
 function clickSetButton()
@@ -88,7 +114,8 @@ function setSetting()
     var sPlayerOffsetPx = document.getElementById("inputPlayerOffset").value;
     var bFontShadow = document.getElementById("inputFontShadow").checked;
     var sTransparentRatio = document.getElementById("inputTransparentRatio").value;
-
+    var bEnable = gbEnable;
+    
     chrome.extension.sendMessage({
         msg: "SetSetting",
         fontColor: sFontColor,
@@ -102,7 +129,8 @@ function setSetting()
         backTransparent: bBackTransparent,
         downloadLink: bDownloadLink,
         fontShadow: bFontShadow,
-        transparentRatio: sTransparentRatio
+        transparentRatio: sTransparentRatio,
+        enable: bEnable
     }, function(response) {
       
     });
@@ -116,18 +144,18 @@ function getSetting()
     }, function(response) {
         giScreenWidth = response.screenWidth;
         giScreenHeight = response.screenHeight;
+        gbEnable = response.enable;
         
         setButtonHTML(response.onRightPage);
         
-        if (response.onRightPage && giScreenWidth <= 0) 
+        if (gbEnable && response.onRightPage && giScreenWidth <= 0) 
         {
             //alert("NEED RELOAD PAGE");
-            // need reload page for getting the right screen width
-            reloadPage();
+            reloadPage(); // need reload page for getting the right screen width
         }
         
         resetSizeSetting();
-        
+
         setLanguage();
         
         setByResponse(response);
@@ -147,23 +175,23 @@ function resetSizeSetting()
 
 function reloadPage()
 {
-    // close the pop window
-    window.close(); 
-
     // reload the current tab window
     chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
         var code = "window.location.reload();";
         chrome.tabs.executeScript(arrayOfTabs[0].id, {code: code});
+
+        window.close(); // close the pop window
     });
 }
 
 function initSetting()
 {
     chrome.extension.sendMessage({
-        msg: "GetInitSetting",
+        msg: "GetInitSetting"
     }, function(response) {
         giScreenWidth = response.screenWidth;
         giScreenHeight = response.screenHeight;
+        gbEnable = response.enable;
     
         setByResponse(response);
         
@@ -186,4 +214,7 @@ function setByResponse(response)
     document.getElementById("inputFontShadow").checked = response.fontShadow;
     document.getElementById("inputTransparentRatio").value = response.transparentRatio;
     
+    //var sEnableText = response.enable ? chrome.i18n.getMessage("_disableButton") : chrome.i18n.getMessage("_enableButton");
+    
+    //document.getElementById("aEnableButton").innerHTML = sEnableText;
 }

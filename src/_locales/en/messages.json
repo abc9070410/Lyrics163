@@ -49,5 +49,11 @@
     },
     "_backTransparentRatio": {
         "message": "Back Transparent Ratio : "
+    },
+    "_enableButton": {
+        "message": "Enable"
+    },
+    "_disableButton": {
+        "message": "Disable"
     }
 }

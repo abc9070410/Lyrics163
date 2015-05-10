@@ -49,5 +49,11 @@
     },
     "_backTransparentRatio": {
         "message": "背景透明度 : "
+    },
+    "_enableButton": {
+        "message": "启用"
+    },
+    "_disableButton": {
+        "message": "关闭"
     }
 }
