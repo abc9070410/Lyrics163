@@ -97,6 +97,7 @@ function setButtonHTML(bVisible)
 
     document.getElementById("inputResetButton").style.display = sDisplay;
     document.getElementById("inputConfirmButton").style.display = sDisplay;
+    document.getElementById("divEnableButton").style.display = sDisplay;
 }
 
 
