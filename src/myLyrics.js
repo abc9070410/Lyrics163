@@ -375,7 +375,7 @@ function updateSetting()
         gbDownloadLink = response.downloadLink;
         gbFontShadow = response.fontShadow;
         gsTransparentRatio = response.transparentRatio;
-        
+
         changeLayout();
 
         layoutLyrics(giNowLyricsIndex);

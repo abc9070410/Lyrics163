@@ -133,6 +133,7 @@ function onMyMessage(details, sender, callback)
             giScreenWidth = details.screenWidth;
             giScreenHeight = details.screenHeight;
             gsInitPlayerOffset = "" + (giScreenWidth - 100);
+            gsPlayerOffset = gsInitPlayerOffset;
         }
 
         if (callback) {
@@ -159,7 +160,6 @@ function onMyMessage(details, sender, callback)
         }
     }
     else if (details.msg == "GetInitSetting") {
-        
         if (callback) {
             callback({
                 fontColor: gsInitFontColor,
