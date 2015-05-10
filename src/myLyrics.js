@@ -3,7 +3,6 @@
 // @namespace   Lyrics163
 // @description Lyrics163
 // @include     http://music.163.com/*
-// @require     http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.7.2.js
 // @version     1
 // @grant       none
 // ==/UserScript==
@@ -42,8 +41,6 @@ var gsPrevious = "";
 var gsNowSongID = null;
 var giNowLyricsIndex = -1;
 var giTempNowIndex = 0;
-var gbJQery = false;
-
 
 //window.onload = init;
 
@@ -237,20 +234,11 @@ function addDownloadLink()
     }
 
     sHTML += "</fieldset></div>";
-    
-    if (gbJQery)
-    {
-        $("body").prepend(sHTML);
-    }
-    else
-    {
-        var eBody = document.getElementsByTagName("body")[0];
-        var eDiv = document.createElement("div");
-        eDiv.innerHTML = sHTML;
-        eBody.appendChild(eDiv);
 
-        //eDiv.innerHTML = sHTML + eDiv.innerHTML;
-    }
+    var eBody = document.getElementsByTagName("body")[0];
+    var eDiv = document.createElement("div");
+    eDiv.innerHTML = sHTML;
+    eBody.appendChild(eDiv);
 }
 
 function getDownloadHTML(sUrl, sFileName, sTitle)
@@ -546,46 +534,26 @@ function layoutText(sText, bSecond)
     if (existText(bSecond))
     {
         var sID = bSecond ? gsSecondID : gsFirstID;
-        if (gbJQery)
+
+        var eDiv = document.getElementById(sID);
+        if (eDiv)
         {
-            $("#" + sID).html(getTextHtml(sText, bSecond));
-        }
-        else
-        {
-            var eDiv = document.getElementById(sID);
-            if (eDiv)
-            {
-                eDiv.innerHTML = getTextHtml(sText, bSecond);
-            }
+            eDiv.innerHTML = getTextHtml(sText, bSecond);
         }
     }
     else
     {
-        if (gbJQery)
-        {
-            $("body").prepend(getTextHtml(sText, bSecond));
-        }
-        else
-        {
-            var eBody = document.getElementsByTagName("body")[0];
-            var eDiv = document.createElement("div");
-            eDiv.innerHTML = getTextHtml(sText, bSecond);
-            eBody.appendChild(eDiv);
-        }
+        var eBody = document.getElementsByTagName("body")[0];
+        var eDiv = document.createElement("div");
+        eDiv.innerHTML = getTextHtml(sText, bSecond);
+        eBody.appendChild(eDiv);
     }
 }
 
 function existText(bSecond)
 {
     var sID = bSecond ? gsSecondID : gsFirstID;
-    
-    if (gbJQery)
-    {
-        return $("#" + sID).length;
-    }
-    else
-    {
-        return document.getElementById(sID);
-    }
+
+    return document.getElementById(sID);
 }
 
