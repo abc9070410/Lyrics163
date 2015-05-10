@@ -482,7 +482,7 @@ function getTextHtml(sText, bSecond)
     var sShadowCss2 = "text-shadow: #99FFCC 0px 0px 10px;text-shadow: #99FFCC 0px 0px 10px 10px;";
     var sShadowCss3 = "text-shadow: 0px 0px 6px rgba(255,255,255,0.7);";
     
-    var sShadowCss = gbFontShadow ? sShadowCss3 : "";
+    var sShadowCss = gbFontShadow ? sShadowCss1 : "";
     
     var sFontCss = ";font-family:Microsoft JhengHei, Microsoft YaHei; border-radius: 10px 10px 10px 10px; font-weight:900; font-size:" + gsFontSize + "px; color:" + sColor + ";";
     
