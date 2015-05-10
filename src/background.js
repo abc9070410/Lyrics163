@@ -56,11 +56,18 @@ function initBackground()
     checkNowPage();
 
     chrome.extension.onMessage.addListener(onMyMessage);
+    
+    chrome.tabs.onActivated.addListener(function(info) {
+        var tab = chrome.tabs.get(info.tabId, function(tab) {
+            gbOnRightPage = isOnRightPage(tab.url);
+        });
+    });
 
     chrome.storage.local.get('urlData', function(items) {
         var asData = items.urlData;
+        var iDataAmount = 13;
         
-        if (asData && asData.length == 13) // stored the data before
+        if (asData && asData.length == iDataAmount) // stored the data before
         {
             //sFontColor, sBackColor, sFontSize, sFontLeft, sFontBottom 
 
@@ -80,7 +87,7 @@ function initBackground()
         }
         else // have not store the data yet
         {
-            alert("not match:" + asData.length + " != 12");
+            alert("not match:" + asData.length + " != " + iDataAmount);
         }
     });
     
@@ -129,8 +136,7 @@ function onMyMessage(details, sender, callback)
         }
     }
     else if (details.msg == "GetSetting") {
-        checkNowPage();
-        
+    
         if (details.screenWidth) // request from the content script (myLyrics.js)
         {
             giScreenWidth = details.screenWidth;

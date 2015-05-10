@@ -145,7 +145,7 @@ function getSetting()
     }, function(response) {
         giScreenWidth = response.screenWidth;
         giScreenHeight = response.screenHeight;
-        gbEnable = response.enable;
+        gbEnable = response.enable;        
         
         setButtonHTML(response.onRightPage);
         
