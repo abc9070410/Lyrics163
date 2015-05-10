@@ -67,10 +67,9 @@ function initBackground()
         var asData = items.urlData;
         var iDataAmount = 13;
         
-        if (asData && asData.length == iDataAmount) // stored the data before
+        // stored the data before
+        if (asData && asData.length == iDataAmount)
         {
-            //sFontColor, sBackColor, sFontSize, sFontLeft, sFontBottom 
-
             gsFontColor = asData[0];
             gsBackColor = asData[1];
             gsFontSize = asData[2];
@@ -85,8 +84,9 @@ function initBackground()
             gsTransparentRatio = asData[11];
             gbEnable = asData[12];
         }
-        else // have not store the data yet
+        else 
         {
+            // have not store the data yet
             alert("not match:" + asData.length + " != " + iDataAmount);
         }
     });
@@ -137,7 +137,8 @@ function onMyMessage(details, sender, callback)
     }
     else if (details.msg == "GetSetting") {
     
-        if (details.screenWidth) // request from the content script (myLyrics.js)
+        // request from the content script (myLyrics.js)
+        if (details.screenWidth) 
         {
             giScreenWidth = details.screenWidth;
             giScreenHeight = details.screenHeight;

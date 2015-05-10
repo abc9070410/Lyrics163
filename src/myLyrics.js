@@ -42,6 +42,8 @@ var gsPrevious = "";
 var gsNowSongID = null;
 var giNowLyricsIndex = -1;
 var giTempNowIndex = 0;
+var gbJQery = false;
+
 
 //window.onload = init;
 
@@ -103,7 +105,8 @@ function updateLyrics()
 
     iTotalSecond += iEarlyOffset;
     
-    if (iTotalSecond < (3 + iEarlyOffset)) // has not played or change to new song
+    // has not played or change to new song
+    if (iTotalSecond < (3 + iEarlyOffset)) 
     {
         parseNowSong();
     }
@@ -133,8 +136,9 @@ function layoutLyrics(iNowIndex)
         return; // lyrics is not existed
     }
     
-    if (iNowIndex < 0) // initial
+    if (iNowIndex < 0) 
     {
+        // initial
         layoutText(gasLyrics[0], true); // set the second lyrics at the beginning
     }
     else if (gasLyrics.length > iNowIndex)
@@ -164,11 +168,8 @@ function handleDownloadLink()
 {
     var eDiv = document.getElementById("divDownload");
     
-    if (eDiv)
-    {
-        eDiv.innerHTML = "";
-    }
-    
+    removeDownloadLink();
+
     if (gbDownloadLink)
     {
         parseTrackQueue();
@@ -206,14 +207,27 @@ function parseNowSong()
         gsNowSongID = sID;
         parseLyrics(sID); // send a XHR request to get the lyrics
         
-        handleDownloadLink(); // get the download link if the song is changed
+        //handleDownloadLink(); // get the download link if the song is changed
+    }
+}
+
+function removeDownloadLink()
+{
+    var eDiv = document.getElementById("divDownload");
+    
+    if (eDiv)
+    {
+        eDiv.outerHTML = "";
     }
 }
 
 function addDownloadLink()
 {
-    var sHTML = "<div id='divDownload' style='font-family:Microsoft JhengHei, Microsoft YaHei; font-size:" + 14 + "px; color:" + gsFontColor + "; position:fixed;     overflow-y:auto; top:" + 20 + "%; left:" + 0 + "%; z-index:999999900; max-width:50%; max-height:70%;'>";
-    
+    var asRGB = hex2Rgb(gsBackColor);
+    var sTransparentCss = "";// (!asRGB || asRGB.length < 3) ? "" : "; background:rgba(" + parseInt(asRGB[1], 16) + "," + parseInt(asRGB[2], 16) + "," + parseInt(asRGB[3], 16) + "," + 0.3 + ");background: transparent\9;";
+
+    var sHTML = "<div id='divDownload' style='font-family:Microsoft JhengHei, Microsoft YaHei; border-radius: 10px 10px 10px 10px; font-size:" + 14 + "px; color:" + gsFontColor + ";" + sTransparentCss + " position:fixed;     overflow-y:auto; top:" + 20 + "%; left:" + 0 + "%; z-index:999999900; max-width:50%; max-height:70%;'>";
+     
     sHTML += "<fieldset><legend>MP3</legend>";
     
     for (var i = 0; i < gasSongUrl.length; i ++)
@@ -224,7 +238,19 @@ function addDownloadLink()
 
     sHTML += "</fieldset></div>";
     
-    $("body").prepend(sHTML);
+    if (gbJQery)
+    {
+        $("body").prepend(sHTML);
+    }
+    else
+    {
+        var eBody = document.getElementsByTagName("body")[0];
+        var eDiv = document.createElement("div");
+        eDiv.innerHTML = sHTML;
+        eBody.appendChild(eDiv);
+
+        //eDiv.innerHTML = sHTML + eDiv.innerHTML;
+    }
 }
 
 function getDownloadHTML(sUrl, sFileName, sTitle)
@@ -396,6 +422,8 @@ function updateSetting()
         {
             clearLayoutLyrics();
         }
+
+        handleDownloadLink();
     });
 }
 
@@ -508,7 +536,7 @@ function getTextHtml(sText, bSecond)
     var sPositionCss = sText ? "; position:fixed; bottom:" + sFontBottom + "px; left:" + sFontLeft + "px;z-index:999999900;" : "";
     
     var asRGB = hex2Rgb(gsBackColor);
-    var sTransparentCss = gbBackTransparent || !asRGB ? "" : "; background:rgba(" + parseInt(asRGB[1], 16) + "," + parseInt(asRGB[2], 16) + "," + parseInt(asRGB[3], 16) + "," + gsTransparentRatio + ");background: transparent\9;";
+    var sTransparentCss = (gbBackTransparent || !asRGB || asRGB.length < 3) ? "" : "; background:rgba(" + parseInt(asRGB[1], 16) + "," + parseInt(asRGB[2], 16) + "," + parseInt(asRGB[3], 16) + "," + gsTransparentRatio + ");background: transparent\9;";
     
     return "<div id='" + sID + "' style='" + sFontCss + sBackgroundCss + sShadowCss + sPositionCss + sTransparentCss + "'>&nbsp;" + sText + "&nbsp;</div>";
 }
@@ -518,32 +546,46 @@ function layoutText(sText, bSecond)
     if (existText(bSecond))
     {
         var sID = bSecond ? gsSecondID : gsFirstID;
-        $("#" + sID).html(getTextHtml(sText, bSecond));
+        if (gbJQery)
+        {
+            $("#" + sID).html(getTextHtml(sText, bSecond));
+        }
+        else
+        {
+            var eDiv = document.getElementById(sID);
+            if (eDiv)
+            {
+                eDiv.innerHTML = getTextHtml(sText, bSecond);
+            }
+        }
     }
     else
     {
-        $("body").prepend(getTextHtml(sText, bSecond));
+        if (gbJQery)
+        {
+            $("body").prepend(getTextHtml(sText, bSecond));
+        }
+        else
+        {
+            var eBody = document.getElementsByTagName("body")[0];
+            var eDiv = document.createElement("div");
+            eDiv.innerHTML = getTextHtml(sText, bSecond);
+            eBody.appendChild(eDiv);
+        }
     }
 }
 
 function existText(bSecond)
 {
     var sID = bSecond ? gsSecondID : gsFirstID;
-    return $("#" + sID).length;
-}
-
-
-
-
-function copyTextToClipboard(text) 
-{
-    var copyFrom = $('<textarea/>');
-    copyFrom.id = "copyFrom";
-    copyFrom.text(text);
-    $('body').append(copyFrom);
-    copyFrom.select();
-    document.execCommand('copy', true);
-    copyFrom.remove();
-
+    
+    if (gbJQery)
+    {
+        return $("#" + sID).length;
+    }
+    else
+    {
+        return document.getElementById(sID);
+    }
 }
 
