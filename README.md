@@ -13,12 +13,7 @@
 - Notepad++
 - Chrome browser
 
-## External Utility
-
-- waitForKeyElements (https://gist.github.com/BrockA/2625891)
-- jQuery (https://github.com/jquery/jquery)
-
 ## License
 
-- GNU General Public License (http://www.gnu.org/copyleft/gpl.html)
+- The MIT License (http://opensource.org/licenses/MIT)
 
