@@ -63,6 +63,23 @@ function initBackground()
         });
     });
 
+    restoreData();
+}
+
+function sendChangeRequest()
+{
+    chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
+        //alert("ID:" + arrayOfTabs[0].id);
+        chrome.tabs.sendMessage(arrayOfTabs[0].id, {greeting: "ChangeSetting"}, 
+      
+        function(response) {
+            console.log(response.farewell);
+        });
+    });
+}
+
+function restoreData()
+{
     chrome.storage.local.get('urlData', function(items) {
         var asData = items.urlData;
         var iDataAmount = 13;
@@ -88,22 +105,17 @@ function initBackground()
         {
             // have not store the data yet
             alert("not match:" + asData.length + " != " + iDataAmount);
+            
+            storeData(); // store the initial setting cause the data is not expected
         }
     });
-    
-    
 }
 
-function sendChangeRequest()
+function storeData()
 {
-    chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
-        //alert("ID:" + arrayOfTabs[0].id);
-        chrome.tabs.sendMessage(arrayOfTabs[0].id, {greeting: "ChangeSetting"}, 
-      
-        function(response) {
-            console.log(response.farewell);
-        });
-    });
+    var asData = [gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsFontSecondLeft, gsFontSecondBottom, gsPlayerOffset, gbBackTransparent, gbDownloadLink, gbFontShadow, gsTransparentRatio, gbEnable];
+    
+    chrome.storage.local.set({'urlData':asData});
 }
 
 function onMyMessage(details, sender, callback)
@@ -124,8 +136,7 @@ function onMyMessage(details, sender, callback)
         gsTransparentRatio = details.transparentRatio;
         gbEnable = details.enable;
         
-        var asData = [gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsFontSecondLeft, gsFontSecondBottom, gsPlayerOffset, gbBackTransparent, gbDownloadLink, gbFontShadow, gsTransparentRatio, gbEnable];
-        chrome.storage.local.set({'urlData':asData});
+        storeData();
         
         //alert("FB:" + gsFontBottom);
         
