@@ -33,9 +33,9 @@ var giScreenHeight = 0;
 var gbOnRightPage = true;
 var gTab = null;
 
-var gsLyricsSecondText = "NONE2";
-var gsLyricsFirstText = "NONE1";
-var gsNowTime = "00:00 / 00:00";
+var gsLyricsSecondText = "";//"NONE2";
+var gsLyricsFirstText = "";//"NONE1";
+var gsNowTime = "";//"00:00 / 00:00";
 var gsNowSongTitle = "";
 var gsNowSongArtist = "";
 
