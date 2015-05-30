@@ -33,6 +33,10 @@ var giScreenHeight = 0;
 var gbOnRightPage = true;
 var gTab = null;
 
+var gsLyricsSecondText = "";
+var gsLyricsFirstText = "";
+
+
 initBackground();
 
 function isOnRightPage(url)
@@ -40,30 +44,24 @@ function isOnRightPage(url)
     return url.indexOf("music.163.com") > 0;
 }
 
-function checkNowPage()
-{
-    chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
-        var tab = chrome.tabs.get(arrayOfTabs[0].id, function(tab) {
-            gbOnRightPage = isOnRightPage(tab.url);
-            
-            setIcon();
-        });
-    });
-}
-
 function initBackground()
 {
-    checkNowPage();
-
     chrome.extension.onMessage.addListener(onMyMessage);
     
+    addChangeTabListener();
+
+    restoreData();
+}
+
+function addChangeTabListener()
+{
     chrome.tabs.onActivated.addListener(function(info) {
         var tab = chrome.tabs.get(info.tabId, function(tab) {
             gbOnRightPage = isOnRightPage(tab.url);
+            
+            console.log("#Change, New url is " + tab.url);
         });
     });
-
-    restoreData();
 }
 
 function sendChangeRequest()
@@ -176,7 +174,10 @@ function onMyMessage(details, sender, callback)
                 
                 screenWidth: giScreenWidth,
                 screenHeight: giScreenHeight,
-                onRightPage: gbOnRightPage
+                onRightPage: gbOnRightPage,
+                
+                lyricsFirstText: gsLyricsFirstText,
+                lyricsSecondText: gsLyricsSecondText
             });
 
             return true;
@@ -211,8 +212,10 @@ function onMyMessage(details, sender, callback)
         gbOnRightPage = true;
         setIcon();
     }
+    else if (details.msg == "SendLyrics") {
+        setLyrics(details.lyrics, details.second);
+    }
 }
-
 
 function setIcon()
 {   
@@ -224,6 +227,22 @@ function setIcon()
             path: sPath
         });
     });
+}
 
+
+// -------------------------------------2015.5.29
+
+
+function setLyrics(sText, bSecond)
+{
+    console.log(sText + ":" + bSecond);
     
+    if (bSecond)
+    {
+        gsLyricsSecondText = sText;
+    }
+    else
+    {
+        gsLyricsFirstText = sText;
+    }
 }

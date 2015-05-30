@@ -42,12 +42,22 @@ var gsNowSongID = null;
 var giNowLyricsIndex = -1;
 var giTempNowIndex = 0;
 
+var gbOnRightPage = null;
+
+var gsRemoteLyricsFirstText = "NONE1";
+var gsRemoteLyricsSecondText = "NONE2";
+
 //window.onload = init;
 
 init();
 
 function init()
 {
+    //alert("init");
+    
+    console.log("#Content url is " + window.location.href);
+    gbOnRightPage = isOnRightPage(window.location.href);
+    
     updateSetting();
     
     detectPlay();
@@ -72,8 +82,16 @@ function addChangeListener()
 
 function updateLyrics()
 {
+    //var d = new Date();layoutText(d.getTime(), true);return;
+
     if (!gbEnable)
     {
+        return;
+    }
+    
+    if (!gbOnRightPage)
+    {
+        updateSetting();
         return;
     }
 
@@ -127,6 +145,13 @@ function clearLayoutLyrics()
 function layoutLyrics(iNowIndex)
 {
     clearLayoutLyrics();
+    
+    if (!gbOnRightPage)
+    {
+        //console.log("set the lyrics from background");
+        layoutText(gsRemoteLyricsFirstText, false); 
+        layoutText(gsRemoteLyricsSecondText, true); 
+    }
 
     if (!gasLyrics.length) 
     {
@@ -137,16 +162,21 @@ function layoutLyrics(iNowIndex)
     {
         // initial
         layoutText(gasLyrics[0], true); // set the second lyrics at the beginning
+        sendLyrics(gasLyrics[0], true);
     }
     else if (gasLyrics.length > iNowIndex)
     {
         layoutText(gasLyrics[iNowIndex], false);
+        sendLyrics(gasLyrics[iNowIndex], false);
     
         if (gasLyrics.length > iNowIndex + 1 && iNowIndex > 0)
         {
             layoutText(gasLyrics[iNowIndex+1], true);
+            sendLyrics(gasLyrics[iNowIndex+1], true);
         }
     }
+    
+    
 }
 
 function detectPlay()
@@ -400,6 +430,12 @@ function updateSetting()
         gbFontShadow = response.fontShadow;
         gsTransparentRatio = response.transparentRatio;
         gbEnable = response.enable;
+        
+        //console.log("Now 163 ? " + response.onRightPage);
+
+        // lyrics information from 163 page
+        gsRemoteLyricsFirstText = response.lyricsFirstText;
+        gsRemoteLyricsSecondText = response.lyricsSecondText;
 
         if (gbEnable)
         {
@@ -557,3 +593,19 @@ function existText(bSecond)
     return document.getElementById(sID);
 }
 
+
+function sendLyrics(sText, bSecond)
+{
+    chrome.extension.sendMessage({
+        msg: "SendLyrics",
+        lyrics: sText,
+        second: bSecond
+    }, function(response) {
+    });
+}
+
+
+function isOnRightPage(url)
+{
+    return url.indexOf("music.163.com") > 0;
+}
