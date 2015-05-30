@@ -44,8 +44,18 @@ var giTempNowIndex = 0;
 
 var gbOnRightPage = null;
 
-var gsRemoteLyricsFirstText = "NONE1";
-var gsRemoteLyricsSecondText = "NONE2";
+// send the following data to background.js
+var gsNowTime = "";
+var gsNowSongTitle = "";
+var gsNowSongArtist = "";
+
+// get the following data from background.js
+var gsRemoteLyricsFirstText = "";
+var gsRemoteLyricsSecondText = "";
+var gsRemoteNowTime = "";
+var gsRemoteNowSongTitle = "";
+var gsRemoteNowSongArtist = "";
+
 
 //window.onload = init;
 
@@ -53,10 +63,7 @@ init();
 
 function init()
 {
-    //alert("init");
-    
-    console.log("#Content url is " + window.location.href);
-    gbOnRightPage = isOnRightPage(window.location.href);
+    checkNowUrl();
     
     updateSetting();
     
@@ -64,9 +71,15 @@ function init()
     
     addChangeListener();
     
-    window.setInterval(updateLyrics, 1000); 
+    window.setInterval(updateLyrics, 1000); // update lyrics info per second
     
     setIconEnable();
+}
+
+function checkNowUrl()
+{
+    console.log("#Content url is " + window.location.href);
+    gbOnRightPage = isOnRightPage(window.location.href);
 }
 
 function addChangeListener()
@@ -101,19 +114,26 @@ function updateLyrics()
     {
         return;
     }
-    var sHTML = eDiv.innerHTML;
+    var sHTML = eDiv.innerHTML; // ex. <em>00:00</em> / 00:00
     
     var iBegin = sHTML.indexOf("<em>") + 4;
     var iEnd = sHTML.indexOf("</em>");
     
     if (iBegin < 4 || iEnd < iBegin)
     {
-        alert("B&E:" + iBegin + "," + iEnd);
+        console.log("#ERROR: B&E:" + iBegin + "," + iEnd);
         return;
     }
-    var asTime = sHTML.substring(iBegin, iEnd).split(":");
+
+    gsNowTime = sHTML.substring(iBegin, iEnd);
     
-    //alert(asTime);
+    var asTime = gsNowTime.split(":");
+    
+    iBegin = sHTML.indexOf(" / ", iEnd);
+    iEnd = sHTML.length;
+    var sTotalTime = sHTML.substring(iBegin, iEnd);
+    gsNowTime += sTotalTime;
+    //console.log(gsNowTime + "," + sTotalTime + "," + sHTML);
 
     var iTotalSecond = parseInt(asTime[0]) * 60 + parseInt(asTime[1]);
     var iEarlyOffset = 0; // show each lyrics earlier for 1 second
@@ -182,7 +202,6 @@ function layoutLyrics(iNowIndex)
 function detectPlay()
 {
     var aeDiv = document.getElementsByClassName("ply");
-    //alert(aeDiv.length);
     /*
     for (var i = 0; i < aeDiv.length; i ++)
     {
@@ -229,7 +248,7 @@ function parseNowSong()
     
     if (sID != gsNowSongID)
     {
-        //alert("ID:" + sID + "," + gsNowSongID);
+        //console.log("ID:" + sID + "," + gsNowSongID);
         clearLyrics();
         gsNowSongID = sID;
         parseLyrics(sID); // send a XHR request to get the lyrics
@@ -306,10 +325,8 @@ function parseTrackQueue()
         asArtist[i] = asToken[i]["artists"][0]["name"];
         asAlbum[i] = asToken[i]["album"]["name"];
     }
-    
-    //alert(asUrl);
-    
-    //alert(asTitle + asArtist + asAlbum);
+
+    //console.log(asTitle + asArtist + asAlbum);
     
     gasSongUrl = asUrl;
     gasSongTitle = asTitle;
@@ -337,11 +354,11 @@ function storeLyrics()
 {
     if (this.readyState == 4)
     {
-        //alert(this.responseText);
+        //console.log(this.responseText);
         
         if (songIsChanged())
         {
-            //alert("song is changed");
+            //console.log("song is changed");
             return;
         }
         
@@ -393,19 +410,9 @@ function getNowLyricsIndex(sTotalSecond)
         {
             return i;
         }
-        /*
-        else if (i > 1 && giTempNowIndex == -1 && 
-                 iTotoalSecond == timeToSecond(gasTime[i]) - 1 && 
-                 iTotoalSecond > timeToSecond(gasTime[i-1]))
-        {
-            //alert(iTotoalSecond + "," + timeToSecond(gasTime[i-1]) + "," + timeToSecond(gasTime[i]));
-            // update the lyrics cause sometimes the time label jumps 2 seconds once
-            return i; 
-        }
-        */
     }
     
-    //alert("WRONG TIME: [" + sTime + "]");
+    //console.log("WRONG TIME: [" + sTime + "]");
     
     return -1;
 }
@@ -436,10 +443,14 @@ function updateSetting()
         // lyrics information from 163 page
         gsRemoteLyricsFirstText = response.lyricsFirstText;
         gsRemoteLyricsSecondText = response.lyricsSecondText;
-
+        gsRemoteNowTime = response.nowTime;
+        gsRemoteNowSongTitle = response.nowSongTitle;
+        gsRemoteNowSongArtist = response.nowSongArtist;
+        
         if (gbEnable)
         {
             changeLayout();
+            updateSongInfo();
             layoutLyrics(giNowLyricsIndex);
         }
         else
@@ -469,7 +480,8 @@ function changeLayout()
     changeStyle(document.getElementsByClassName("head"), STYLE_RIGHT, iRightOffset);
     changeStyle(document.getElementsByClassName("play"), STYLE_RIGHT, iRightOffset);
     changeStyle(document.getElementsByClassName("oper f-fl"), STYLE_RIGHT, iRightOffsetLess);
-    changeStyle(document.getElementsByClassName("ctrl f-fl f-pr"), STYLE_RIGHT, iRightOffsetLess);
+    changeStyle(document.getElementsByClassName("ctrl f-fl f-pr"), STYLE_RIGHT, iRightOffsetLess);    
+    //console.log("#show: " + document.getElementsByClassName("play")[0].innerHTML);
     
     //changeStyle(document.getElementsByClassName("play"), STYLE_WIDTH, 20);
     //changeStyle(document.getElementsByClassName("m-pbar"), STYLE_WIDTH, 80);
@@ -562,7 +574,10 @@ function getTextHtml(sText, bSecond)
     var asRGB = hex2Rgb(gsBackColor);
     var sTransparentCss = (gbBackTransparent || !asRGB || asRGB.length < 3) ? "" : "; background:rgba(" + parseInt(asRGB[1], 16) + "," + parseInt(asRGB[2], 16) + "," + parseInt(asRGB[3], 16) + "," + gsTransparentRatio + ");background: transparent\9;";
     
-    return "<div id='" + sID + "' style='" + sFontCss + sBackgroundCss + sShadowCss + sPositionCss + sTransparentCss + "'>&nbsp;" + sText + "&nbsp;</div>";
+    var sSongInfo = (gbOnRightPage || !bSecond) ? "" : "<div style='font-size:30%; color:" + getDarkColor(sColor, 10) + "'>" + gsRemoteNowSongArtist + " - " + gsRemoteNowSongTitle + "&nbsp;&nbsp;" + gsRemoteNowTime + "</div>";
+    
+    
+    return "<div id='" + sID + "' style='" + sFontCss + sBackgroundCss + sShadowCss + sPositionCss + sTransparentCss + "'>" + sSongInfo + "&nbsp;" + sText + "&nbsp;</div>";
 }
 
 function layoutText(sText, bSecond)
@@ -599,7 +614,10 @@ function sendLyrics(sText, bSecond)
     chrome.extension.sendMessage({
         msg: "SendLyrics",
         lyrics: sText,
-        second: bSecond
+        second: bSecond,
+        nowTime: gsNowTime,
+        nowSongTitle: gsNowSongTitle,
+        nowSongArtist: gsNowSongArtist
     }, function(response) {
     });
 }
@@ -608,4 +626,28 @@ function sendLyrics(sText, bSecond)
 function isOnRightPage(url)
 {
     return url.indexOf("music.163.com") > 0;
+}
+
+function updateSongInfo()
+{
+    var eDiv = document.getElementsByClassName("f-thide name fc1 f-fl")[0];
+    
+    if (eDiv && eDiv.title)
+    {
+        gsNowSongTitle = eDiv.title;
+    }
+    
+    eDiv = document.getElementsByClassName("by f-thide f-fl")[0];
+    
+    if (eDiv)
+    {
+        eDiv = eDiv.getElementsByTagName("span")[0];
+        
+        if (eDiv && eDiv.title)
+        {
+            gsNowSongArtist = eDiv.title;
+        }
+    }
+    
+    //console.log("Artist: " + gsNowSongArtist + ", Title: " + gsNowSongTitle);
 }

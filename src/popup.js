@@ -145,13 +145,13 @@ function getSetting()
     }, function(response) {
         giScreenWidth = response.screenWidth;
         giScreenHeight = response.screenHeight;
-        gbEnable = response.enable;        
+        gbEnable = response.enable;
         
-        setButtonHTML(response.onRightPage);
+        setButtonHTML(true);
         
         if (gbEnable && response.onRightPage && giScreenWidth <= 0) 
         {
-            //alert("NEED RELOAD PAGE");
+            //console.log("NEED RELOAD PAGE");
             reloadPage(); // need reload page for getting the right screen width
         }
         

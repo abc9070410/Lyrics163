@@ -33,9 +33,11 @@ var giScreenHeight = 0;
 var gbOnRightPage = true;
 var gTab = null;
 
-var gsLyricsSecondText = "";
-var gsLyricsFirstText = "";
-
+var gsLyricsSecondText = "NONE2";
+var gsLyricsFirstText = "NONE1";
+var gsNowTime = "00:00 / 00:00";
+var gsNowSongTitle = "";
+var gsNowSongArtist = "";
 
 initBackground();
 
@@ -67,7 +69,7 @@ function addChangeTabListener()
 function sendChangeRequest()
 {
     chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
-        //alert("ID:" + arrayOfTabs[0].id);
+        //console.log("ID:" + arrayOfTabs[0].id);
         chrome.tabs.sendMessage(arrayOfTabs[0].id, {greeting: "ChangeSetting"}, 
       
         function(response) {
@@ -102,7 +104,7 @@ function restoreData()
         else 
         {
             // have not store the data yet
-            alert("not match:" + asData.length + " != " + iDataAmount);
+            console.log("#ERROR: not match:" + asData.length + " != " + iDataAmount);
             
             storeData(); // store the initial setting cause the data is not expected
         }
@@ -136,7 +138,7 @@ function onMyMessage(details, sender, callback)
         
         storeData();
         
-        //alert("FB:" + gsFontBottom);
+        //console.log("FB:" + gsFontBottom);
         
         sendChangeRequest();
         
@@ -177,7 +179,10 @@ function onMyMessage(details, sender, callback)
                 onRightPage: gbOnRightPage,
                 
                 lyricsFirstText: gsLyricsFirstText,
-                lyricsSecondText: gsLyricsSecondText
+                lyricsSecondText: gsLyricsSecondText,
+                nowTime: gsNowTime,
+                nowSongTitle: gsNowSongTitle,
+                nowSongArtist: gsNowSongArtist
             });
 
             return true;
@@ -214,6 +219,10 @@ function onMyMessage(details, sender, callback)
     }
     else if (details.msg == "SendLyrics") {
         setLyrics(details.lyrics, details.second);
+
+        gsNowTime = details.nowTime;
+        gsNowSongTitle = details.nowSongTitle;
+        gsNowSongArtist = details.nowSongArtist;
     }
 }
 
@@ -235,7 +244,7 @@ function setIcon()
 
 function setLyrics(sText, bSecond)
 {
-    console.log(sText + ":" + bSecond);
+    //console.log(sText + ":" + bSecond);
     
     if (bSecond)
     {
@@ -245,4 +254,5 @@ function setLyrics(sText, bSecond)
     {
         gsLyricsFirstText = sText;
     }
+
 }
