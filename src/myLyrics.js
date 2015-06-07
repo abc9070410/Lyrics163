@@ -253,7 +253,7 @@ function parseNowSong()
         gsNowSongID = sID;
         parseLyrics(sID); // send a XHR request to get the lyrics
         
-        //handleDownloadLink(); // get the download link if the song is changed
+        handleDownloadLink(); // get the download link if the song is changed
     }
 }
 
@@ -433,7 +433,19 @@ function updateSetting()
         gsFontSecondBottom = response.fontSecondBottom;
         gsPlayerOffset = response.playerOffset;
         gbBackTransparent = response.backTransparent;
-        gbDownloadLink = response.downloadLink;
+        
+        
+        if (!gbDownloadLink && response.downloadLink) // add download link
+        {
+            gbDownloadLink = true;
+            handleDownloadLink();
+        }
+        else if (gbDownloadLink && !response.downloadLink) // remove download link
+        {
+            gbDownloadLink = false;
+            removeDownloadLink();
+        }
+
         gbFontShadow = response.fontShadow;
         gsTransparentRatio = response.transparentRatio;
         gbEnable = response.enable;
@@ -457,8 +469,6 @@ function updateSetting()
         {
             clearLayoutLyrics();
         }
-
-        handleDownloadLink();
     });
 }
 
