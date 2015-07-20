@@ -46,6 +46,8 @@ var gbOnRightPage = null;
 
 // send the following data to background.js
 var gsNowTime = "";
+var gsLastTime = "";
+var giTimeOffset = 0;
 var gsNowSongTitle = "";
 var gsNowSongArtist = "";
 
@@ -56,6 +58,8 @@ var gsRemoteNowTime = "";
 var gsRemoteNowSongTitle = "";
 var gsRemoteNowSongArtist = "";
 
+// check the next second if there exists no lyrics at now and last second 
+var gbLastSecondGotLyrics = false; 
 
 //window.onload = init;
 
@@ -70,7 +74,7 @@ function init()
     detectPlay();
     
     addChangeListener();
-    
+
     window.setInterval(updateLyrics, 1000); // update lyrics info per second
     
     setIconEnable();
@@ -99,6 +103,7 @@ function updateLyrics()
 
     if (!gbEnable)
     {
+        //console.log("[LY163]updateLyrics : " + gbEnable);
         return;
     }
     
@@ -133,7 +138,8 @@ function updateLyrics()
     iEnd = sHTML.length;
     var sTotalTime = sHTML.substring(iBegin, iEnd);
     gsNowTime += sTotalTime;
-    //console.log(gsNowTime + "," + sTotalTime + "," + sHTML);
+    
+    //console.log("[LY163]updateLyrics : " + gsNowTime + "," + sTotalTime + "," + sHTML);
 
     var iTotalSecond = parseInt(asTime[0]) * 60 + parseInt(asTime[1]);
     var iEarlyOffset = 0; // show each lyrics earlier for 1 second
@@ -150,10 +156,30 @@ function updateLyrics()
     
     updateSetting(); // update setting, and reset the lyrics and layout later
     
+    if (gsNowTime == gsLastTime && giTempNowIndex < 0)
+    {
+        giTimeOffset++;
+        
+        for (var i = 1; i < giTimeOffset; i ++)
+        {
+            giTempNowIndex = getNowLyricsIndex(iTotalSecond + i); // 
+        }
+    }
+    else
+    {
+        giTimeOffset = 0;
+    }
+    
+    console.log("[LY163]updateLyrics : " + iTotalSecond + "," + giTempNowIndex);
+    
     if (giTempNowIndex >= 0)
     {
         giNowLyricsIndex = giTempNowIndex; // change the lyrics index first
     }
+    
+    gbLastSecondGotLyrics = giTempNowIndex > 0;
+
+    gsLastTime = gsNowTime;
 }
 
 function clearLayoutLyrics()
@@ -376,6 +402,12 @@ function storeLyrics()
         }
 
         layoutLyrics(-1);
+        
+        console.log("[LY163]storeLyrics : " + gasTime.length);
+        for (i = 0; i < gasTime.length; i ++)
+        {
+            console.log("[LY163][" + gasTime[i] + "] : " + gasLyrics[i]);
+        }
     }
 }
 
@@ -564,6 +596,12 @@ function getDarkColor(hex, iOffset)
 
 function getTextHtml(sText, bSecond)
 {
+    if (!gbEnable)
+    {
+        console.log("[LY163]getTextHtml : clear all cause disable");
+        return "";
+    }
+    
     var sFontLeft = bSecond ? gsFontSecondLeft : gsFontLeft;
     var sFontBottom = bSecond ? gsFontSecondBottom : gsFontBottom;
     var sID = bSecond ? gsSecondID : gsFirstID;
@@ -597,6 +635,7 @@ function layoutText(sText, bSecond)
         var sID = bSecond ? gsSecondID : gsFirstID;
 
         var eDiv = document.getElementById(sID);
+        
         if (eDiv)
         {
             eDiv.innerHTML = getTextHtml(sText, bSecond);

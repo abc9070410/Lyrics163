@@ -100,6 +100,8 @@ function restoreData()
             gbFontShadow = asData[10];
             gsTransparentRatio = asData[11];
             gbEnable = asData[12];
+            
+            console.log("[LY163]ReStoreData : " + gbEnable);
         }
         else 
         {
@@ -113,6 +115,8 @@ function restoreData()
 
 function storeData()
 {
+    console.log("[LY163]StoreData : " + gbEnable);
+    
     var asData = [gsFontColor, gsBackColor, gsFontSize, gsFontLeft, gsFontBottom, gsFontSecondLeft, gsFontSecondBottom, gsPlayerOffset, gbBackTransparent, gbDownloadLink, gbFontShadow, gsTransparentRatio, gbEnable];
     
     chrome.storage.local.set({'urlData':asData});
@@ -137,9 +141,7 @@ function onMyMessage(details, sender, callback)
         gbEnable = details.enable;
         
         storeData();
-        
-        //console.log("FB:" + gsFontBottom);
-        
+
         sendChangeRequest();
         
         if (callback) {
@@ -230,7 +232,8 @@ function setIcon()
 {   
     var sPath = gbOnRightPage ? "icon19.png" : "icon19grey.png";
     
-    chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
+    //chrome.tabs.query({active: true, currentWindow: true}, function (arrayOfTabs) {
+    chrome.tabs.query({active: true}, function (arrayOfTabs) {
         chrome.browserAction.setIcon({
             tabId: arrayOfTabs[0].id,
             path: sPath
