@@ -1,7 +1,7 @@
 {
     "name": "__MSG__appName__",
     "manifest_version": 2,
-    "version": "0.1.2.2",
+    "version": "0.1.2.3",
     "description": "__MSG__appDesc__",
     "icons": {
         "16": "icon16.png",
@@ -32,7 +32,7 @@
                 "myLyrics.css"
             ],
             "js": [
-                "myLyrics.js"
+                "SC2TC.js", "myLyrics.js"
             ]
         }
     ]

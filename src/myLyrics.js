@@ -347,9 +347,9 @@ function parseTrackQueue()
     for (var i = 0; i < asToken.length; i ++)
     {
         asUrl[i] = asToken[i]["mp3Url"];
-        asTitle[i] = asToken[i]["name"];
-        asArtist[i] = asToken[i]["artists"][0]["name"];
-        asAlbum[i] = asToken[i]["album"]["name"];
+        asTitle[i] = getTraditionalChinese(asToken[i]["name"]);
+        asArtist[i] = getTraditionalChinese(asToken[i]["artists"][0]["name"]);
+        asAlbum[i] = getTraditionalChinese(asToken[i]["album"]["name"]);
     }
 
     //console.log(asTitle + asArtist + asAlbum);
@@ -396,7 +396,7 @@ function storeLyrics()
             
             if (sToken && sToken != "" && sToken.indexOf("http://") < 0)
             {
-                gasLyrics[gasLyrics.length] = sToken;
+                gasLyrics[gasLyrics.length] = getTraditionalChinese(sToken);
                 gasTime[gasTime.length] = asTemp[i-1];
             }
         }
@@ -488,8 +488,8 @@ function updateSetting()
         gsRemoteLyricsFirstText = response.lyricsFirstText;
         gsRemoteLyricsSecondText = response.lyricsSecondText;
         gsRemoteNowTime = response.nowTime;
-        gsRemoteNowSongTitle = response.nowSongTitle;
-        gsRemoteNowSongArtist = response.nowSongArtist;
+        gsRemoteNowSongTitle = getTraditionalChinese(response.nowSongTitle);
+        gsRemoteNowSongArtist = getTraditionalChinese(response.nowSongArtist);
         
         if (gbEnable)
         {
@@ -700,3 +700,15 @@ function updateSongInfo()
     
     //console.log("Artist: " + gsNowSongArtist + ", Title: " + gsNowSongTitle);
 }
+
+function getTraditionalChinese(sText)
+{
+    // simplified chinese -> traditional chinese
+    for (var i = 0; i < SC2TC_DATA.length; i++)
+    {
+        sText = sText.replace(new RegExp(SC2TC_DATA[i][0], "g"), SC2TC_DATA[i][1]);
+    }
+    
+    return sText;
+}
+
